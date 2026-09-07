@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="300" viewBox="0 0 480 300" role="img" aria-labelledby="title">
+  <title id="title">SEO and PageSpeed card</title>
+  <rect width="480" height="300" rx="18" fill="#f2f5f8"/>
+  <circle cx="160" cy="150" r="82" fill="#ffffff" stroke="#d6e0e5"/>
+  <path d="M160 150 L218 102" stroke="#0d7c66" stroke-width="12" stroke-linecap="round"/>
+  <path d="M95 150 A65 65 0 0 1 225 150" fill="none" stroke="#dff3ec" stroke-width="18"/>
+  <rect x="278" y="92" width="120" height="18" rx="9" fill="#162026"/>
+  <rect x="278" y="132" width="92" height="12" rx="6" fill="#b8cbc7"/>
+  <rect x="278" y="158" width="132" height="12" rx="6" fill="#d4e1df"/>
+  <rect x="278" y="196" width="76" height="28" rx="6" fill="#0d7c66"/>
+</svg>

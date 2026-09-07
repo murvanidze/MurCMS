@@ -1,0 +1,64 @@
+.murtext-editor-tools {
+  margin: 0 0 .55rem;
+}
+
+.murtext-editor-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .35rem;
+  align-items: center;
+}
+
+.murtext-editor-toolbar button {
+  min-height: 2rem;
+  padding: .3rem .55rem;
+  border: 1px solid var(--admin-border, #d5dae1);
+  border-radius: .4rem;
+  background: var(--admin-surface, #fff);
+  color: inherit;
+  font: inherit;
+  font-size: .82rem;
+  cursor: pointer;
+}
+
+.murtext-editor-toolbar button:hover,
+.murtext-editor-toolbar button:focus-visible {
+  border-color: currentColor;
+}
+
+.murtext-editor-toolbar .murtext-help-button {
+  margin-left: auto;
+  font-weight: 600;
+}
+
+.murtext-help-dialog {
+  width: min(760px, calc(100vw - 2rem));
+  max-height: calc(100vh - 2rem);
+  padding: 1.25rem;
+  border: 0;
+  border-radius: .75rem;
+  box-shadow: 0 1.5rem 4rem rgb(0 0 0 / .24);
+  overflow: auto;
+}
+
+.murtext-help-dialog::backdrop {
+  background: rgb(15 23 42 / .5);
+}
+
+.murtext-dialog-close {
+  position: absolute;
+  top: .65rem;
+  right: .75rem;
+  border: 0;
+  background: transparent;
+  font-size: 1.6rem;
+  cursor: pointer;
+}
+
+.murtext-help-content h2 {
+  margin-top: 0;
+}
+
+.murtext-help-content code {
+  white-space: nowrap;
+}

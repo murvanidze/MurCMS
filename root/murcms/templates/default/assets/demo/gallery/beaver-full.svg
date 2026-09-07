@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800" role="img" aria-labelledby="title">
+  <title id="title">Full-size beaver gallery demo image</title>
+  <rect width="1200" height="800" fill="#e7f0f7"/>
+  <path d="M0 520 C155 470 260 555 420 510 C590 462 708 520 875 482 C1010 452 1090 475 1200 438 L1200 800 L0 800 Z" fill="#7fb6c6"/>
+  <ellipse cx="595" cy="410" rx="210" ry="145" fill="#73513f"/>
+  <circle cx="760" cy="338" r="96" fill="#7c5743"/>
+  <circle cx="735" cy="320" r="12" fill="#162026"/>
+  <circle cx="796" cy="321" r="12" fill="#162026"/>
+  <path d="M805 374 L862 393" stroke="#f3eee7" stroke-width="16" stroke-linecap="round"/>
+  <ellipse cx="400" cy="530" rx="135" ry="58" fill="#5a3c31" transform="rotate(-18 400 530)"/>
+  <text x="600" y="710" text-anchor="middle" font-family="Arial, sans-serif" font-size="42" fill="#325d69">Full image 1200 x 800</text>
+</svg>

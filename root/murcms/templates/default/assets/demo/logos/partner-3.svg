@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="180" height="90" viewBox="0 0 180 90" role="img" aria-labelledby="title">
+  <title id="title">Gamma partner logo</title>
+  <rect width="180" height="90" rx="10" fill="#ffffff"/>
+  <path d="M50 24 L74 66 H26 Z" fill="#d8b24a"/>
+  <text x="88" y="51" font-family="Arial, sans-serif" font-size="21" font-weight="700" fill="#162026">GAMMA</text>
+</svg>

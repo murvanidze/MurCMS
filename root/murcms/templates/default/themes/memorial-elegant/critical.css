@@ -1,0 +1,161 @@
+.ts-memorial-elegant {
+  color-scheme: light;
+  --bg: #f1f1ef;
+  --surface: #ffffff;
+  --surface-soft: #f7f7f4;
+  --text: #262624;
+  --muted: #67645f;
+  --line: #d7d4ce;
+  --line-strong: #aaa69e;
+  --accent: #9a7418;
+  --accent-strong: #74540d;
+  --accent-soft: #f3ead0;
+  --ink: #171716;
+  --hero: #242423;
+  --hero-muted: #d7d3ca;
+  --shadow: none;
+  background: var(--bg);
+  font-family: Georgia, "Times New Roman", Times, serif;
+  font-size: 17px;
+  line-height: 1.68;
+  text-rendering: optimizeLegibility;
+}
+
+.ts-memorial-elegant .site-header {
+  min-height: 70px;
+  padding-top: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+  background: #fff;
+  backdrop-filter: none;
+}
+
+.ts-memorial-elegant .site-brand a {
+  color: var(--ink);
+  font-family: Georgia, "Times New Roman", Times, serif;
+  font-size: 22px;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+}
+
+.ts-memorial-elegant .site-menu a,
+.ts-memorial-elegant .language-current {
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 0.015em;
+}
+
+.ts-memorial-elegant .site-menu ul,
+.ts-memorial-elegant .language-menu-list {
+  border-color: var(--line);
+  border-radius: 0;
+  background: #fff;
+  box-shadow: none;
+}
+
+.ts-memorial-elegant .site-menu-toggle,
+.ts-memorial-elegant .language-toggle {
+  border-color: var(--line-strong);
+  border-radius: 0;
+  background: #fff;
+}
+
+.ts-memorial-elegant .site-main {
+  width: min(calc(100% - 32px), calc(var(--site-width, 1040px) + 96px));
+  padding: 0 48px 72px;
+  background: var(--bg);
+}
+
+.ts-memorial-elegant .home-hero {
+  margin: 0 -48px;
+  padding: clamp(58px, 9vw, 104px) 48px clamp(54px, 8vw, 88px);
+  border: 0;
+  border-bottom: 3px solid var(--accent);
+  background: var(--hero);
+  color: #fff;
+}
+
+.ts-memorial-elegant .home-hero h1 {
+  max-width: 900px;
+  margin: 0 0 20px;
+  color: #fff;
+  font-size: clamp(42px, 7vw, 76px);
+  font-weight: 400;
+  letter-spacing: -0.035em;
+  line-height: 0.98;
+}
+
+.ts-memorial-elegant .home-hero p {
+  max-width: 760px;
+  margin: 0;
+  color: var(--hero-muted);
+  font-size: clamp(18px, 2.2vw, 23px);
+  line-height: 1.55;
+}
+
+.ts-memorial-elegant .hero-actions {
+  gap: 14px 20px;
+  margin-top: 32px;
+}
+
+.ts-memorial-elegant .button {
+  min-height: 44px;
+  padding: 9px 17px;
+  border-color: var(--accent);
+  border-radius: 0;
+  background: var(--accent);
+  color: #fff;
+  font-family: Georgia, "Times New Roman", Times, serif;
+  font-weight: 400;
+}
+
+.ts-memorial-elegant .home-hero .button-ghost {
+  border-color: #d8d3c8;
+  background: transparent;
+  color: #fff;
+}
+
+.ts-memorial-elegant .page-header {
+  margin-bottom: 36px;
+  padding: 46px 0 28px;
+  border-bottom-color: var(--line-strong);
+}
+
+.ts-memorial-elegant .page-header h1 {
+  max-width: 900px;
+  color: var(--ink);
+  font-size: clamp(36px, 5.2vw, 58px);
+  font-weight: 400;
+  letter-spacing: -0.025em;
+  line-height: 1.04;
+}
+
+.ts-memorial-elegant .breadcrumbs {
+  margin: 0;
+  padding-top: 24px;
+  font-size: 13px;
+  font-style: italic;
+}
+
+@media (max-width: 760px) {
+  .ts-memorial-elegant {
+    font-size: 16px;
+  }
+
+  .ts-memorial-elegant .site-header {
+    min-height: 66px;
+  }
+
+  .ts-memorial-elegant .site-main {
+    width: 100%;
+    padding-right: 20px;
+    padding-left: 20px;
+  }
+
+  .ts-memorial-elegant .home-hero {
+    margin-right: -20px;
+    margin-left: -20px;
+    padding-right: 20px;
+    padding-left: 20px;
+  }
+}

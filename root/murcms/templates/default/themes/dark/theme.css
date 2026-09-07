@@ -1,0 +1,15 @@
+/* External: closed-menu-independent surfaces and effects. */
+.ts-dark .site-menu ul,
+.ts-dark .language-menu-list,
+.ts-dark .site-footer {
+  background: var(--surface);
+}
+
+.ts-dark .site-header {
+  backdrop-filter: none;
+}
+
+.ts-dark .site-menu ul,
+.ts-dark .language-menu-list {
+  border-color: var(--line);
+}

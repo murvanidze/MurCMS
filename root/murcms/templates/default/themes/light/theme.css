@@ -1,0 +1,11 @@
+/* External: surfaces that are outside the initial closed-menu viewport. */
+.ts-light .site-menu ul,
+.ts-light .language-menu-list,
+.ts-light .site-footer {
+  background: var(--surface);
+}
+
+.ts-light .site-menu ul,
+.ts-light .language-menu-list {
+  border-color: var(--line);
+}

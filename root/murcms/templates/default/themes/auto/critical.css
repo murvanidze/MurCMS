@@ -1,0 +1,35 @@
+.ts-auto {
+  color-scheme: light;
+  --bg: #f7f9fb;
+  --surface: #ffffff;
+  --surface-soft: #eef5f3;
+  --text: #162026;
+  --muted: #5d6b73;
+  --line: #d6e0e5;
+  --accent: #0d7c66;
+  --accent-strong: #075746;
+  --accent-soft: #dff3ec;
+  --ink: #0f1c22;
+  --shadow: 0 16px 40px rgba(20, 36, 44, 0.08);
+}
+
+@media (prefers-color-scheme: dark) {
+  .ts-auto {
+    color-scheme: dark;
+    --bg: #111416;
+    --surface: #1c2124;
+    --surface-soft: #242b2e;
+    --text: #e8edef;
+    --muted: #b0bcc1;
+    --line: #3b464b;
+    --accent: #65d2b7;
+    --accent-strong: #91e5d0;
+    --accent-soft: #183e35;
+    --ink: #f7fafb;
+    --shadow: 0 16px 40px rgba(0, 0, 0, 0.3);
+  }
+
+  .ts-auto .site-header {
+    background: #171b1d;
+  }
+}

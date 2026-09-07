@@ -1,0 +1,19 @@
+/* Inline: palette and final header paint for the first viewport. */
+.ts-dark {
+  color-scheme: dark;
+  --bg: #111416;
+  --surface: #1c2124;
+  --surface-soft: #242b2e;
+  --text: #e8edef;
+  --muted: #b0bcc1;
+  --line: #3b464b;
+  --accent: #65d2b7;
+  --accent-strong: #91e5d0;
+  --accent-soft: #183e35;
+  --ink: #f7fafb;
+  --shadow: 0 16px 40px rgba(0, 0, 0, 0.3);
+}
+
+.ts-dark .site-header {
+  background: var(--surface);
+}

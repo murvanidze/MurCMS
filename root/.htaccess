@@ -1,0 +1,50 @@
+Options -Indexes
+DirectoryIndex index.php
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # The physical root/admin directory contains language files. Always route
+    # admin URLs through the authenticated front controller.
+    RewriteRule ^admin(?:/.*)?$ index.php [L,QSA]
+
+    # Never expose CMS source, configuration, content sources or backups.
+    RewriteRule ^data(?:/|$) - [F,L,NC]
+    RewriteRule ^murcms/(?:app|admin|plugins)(?:/|$) - [F,L,NC]
+    RewriteRule ^murcms/templates/.+\.php$ - [F,L,NC]
+    RewriteRule ^(?:docs|scripts|sources|tests)(?:/|$) - [F,L,NC]
+
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^ index.php [L,QSA]
+</IfModule>
+
+<FilesMatch "(^\.|\.mur\.md$|\.md$|\.bak(?:\.[0-9]+)?$|\.log$|\.dist\.php$|composer\.(?:json|lock)$)">
+    Require all denied
+</FilesMatch>
+
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    Header always set X-Frame-Options "SAMEORIGIN"
+
+    <FilesMatch "\.(css|js|mjs|svg|jpg|jpeg|png|gif|webp|avif|ico|woff2?)$">
+        Header set Cache-Control "public, max-age=31536000, immutable"
+    </FilesMatch>
+</IfModule>
+
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType text/css "access plus 1 year"
+    ExpiresByType application/javascript "access plus 1 year"
+    ExpiresByType image/svg+xml "access plus 1 year"
+    ExpiresByType image/jpeg "access plus 1 year"
+    ExpiresByType image/png "access plus 1 year"
+    ExpiresByType image/webp "access plus 1 year"
+    ExpiresByType image/avif "access plus 1 year"
+    ExpiresByType font/woff2 "access plus 1 year"
+</IfModule>
+
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/css application/javascript application/json image/svg+xml
+</IfModule>

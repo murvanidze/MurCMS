@@ -1,0 +1,448 @@
+.murconsent-admin {
+    max-width: 1180px;
+}
+
+.murconsent-admin__panel,
+.murconsent-admin__notice {
+    margin: 20px 0;
+    padding: 18px 20px;
+    border: 1px solid #d8dadd;
+    border-radius: 8px;
+    background: #fff;
+}
+
+.murconsent-admin__panel h2,
+.murconsent-admin__panel h3,
+.murconsent-admin__notice p:last-child {
+    margin-bottom: 0;
+}
+
+.murconsent-admin__panel h2 {
+    margin-top: 0;
+}
+
+.murconsent-admin__status-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+    margin: 15px 0;
+}
+
+.murconsent-admin__status-grid > div {
+    min-width: 0;
+    padding: 12px;
+    border: 1px solid #e2e4e7;
+    border-radius: 6px;
+    background: #f7f8f9;
+}
+
+.murconsent-admin__status-grid span,
+.murconsent-admin__status-grid strong {
+    display: block;
+}
+
+.murconsent-admin__status-grid span {
+    margin-bottom: 4px;
+    color: #667078;
+    font-size: .86em;
+}
+
+.murconsent-admin__state {
+    margin: 10px 0 0;
+    padding: 10px 12px;
+    border-left: 4px solid #77828a;
+    background: #f5f6f7;
+}
+
+.murconsent-admin__state--ok {
+    border-color: #2e8b57;
+}
+
+.murconsent-admin__state--warning,
+.murconsent-admin__state--note {
+    border-color: #c58b18;
+}
+
+.murconsent-admin__state--error {
+    border-color: #c83e3e;
+}
+
+.murconsent-admin__preview {
+    margin: 14px 0 0;
+}
+
+.murconsent-admin__snippets {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+}
+
+.murconsent-admin__snippets > div {
+    min-width: 0;
+}
+
+.murconsent-admin pre {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+.murconsent-admin code {
+    overflow-wrap: anywhere;
+}
+
+.murconsent-admin__notice {
+    border-color: #ead7aa;
+    background: #fffaf0;
+}
+
+.murconsent-admin__tab {
+    padding: 20px;
+    border: 1px solid #d8dadd;
+    border-top: 0;
+    background: #fff;
+}
+
+.murconsent-admin__tab > h2:first-child {
+    margin-top: 0;
+}
+
+.murconsent-admin__intro {
+    margin: 0 0 20px;
+    color: #59636b;
+}
+
+.murconsent-admin__field {
+    max-width: 920px;
+}
+
+.murconsent-admin__field input[type="text"],
+.murconsent-admin__field select,
+.murconsent-admin__field textarea {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 100%;
+}
+
+.murconsent-admin__field textarea {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    white-space: pre-wrap;
+}
+
+.murconsent-admin__field--checkbox > label {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-weight: 700;
+}
+
+.murconsent-admin__field--checkbox input.checkbox {
+    flex: 0 0 auto;
+}
+
+.murconsent-admin__validation {
+    max-width: 920px;
+    padding: 10px 12px;
+    border-left: 4px solid #777;
+    background: #f5f6f7;
+}
+
+.murconsent-admin__validation--ok {
+    border-color: #2e8b57;
+}
+
+.murconsent-admin__validation--error {
+    border-color: #c83e3e;
+}
+
+@media (max-width: 900px) {
+    .murconsent-admin__status-grid,
+    .murconsent-admin__snippets {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 620px) {
+    .murconsent-admin__status-grid,
+    .murconsent-admin__snippets {
+        grid-template-columns: 1fr;
+    }
+
+    .murconsent-admin__tab {
+        padding: 14px;
+    }
+}
+
+.murconsent-admin__notice--inline {
+    margin: 16px 0 20px;
+}
+
+.murconsent-admin__language {
+    margin: 14px 0;
+    border: 1px solid #d8dadd;
+    border-radius: 8px;
+    background: #fff;
+}
+
+.murconsent-admin__language > summary {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    cursor: pointer;
+    list-style-position: inside;
+}
+
+.murconsent-admin__language > summary span {
+    color: #667078;
+    font-size: .82em;
+    letter-spacing: .08em;
+}
+
+.murconsent-admin__language[open] > summary {
+    border-bottom: 1px solid #d8dadd;
+}
+
+.murconsent-admin__language-body {
+    padding: 18px;
+}
+
+.murconsent-admin__content-section + .murconsent-admin__content-section {
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid #e2e4e7;
+}
+
+.murconsent-admin__content-section > h3,
+.murconsent-admin__services-heading h4 {
+    margin-top: 0;
+}
+
+.murconsent-admin__services {
+    margin-top: 20px;
+}
+
+.murconsent-admin__services-heading,
+.murconsent-admin__service-card-heading {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.murconsent-admin__service-card {
+    margin-top: 14px;
+    padding: 16px;
+    border: 1px solid #d8dadd;
+    border-radius: 8px;
+    background: #f7f8f9;
+}
+
+.murconsent-admin__service-card-heading {
+    margin-bottom: 12px;
+}
+
+.murconsent-admin__service-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0 18px;
+}
+
+.murconsent-admin__service-grid .murconsent-admin__field {
+    min-width: 0;
+    margin-top: 8px;
+    margin-bottom: 8px;
+}
+
+.murconsent-admin__service-grid .murconsent-admin__field:nth-child(3),
+.murconsent-admin__service-grid .murconsent-admin__field:nth-child(5),
+.murconsent-admin__service-grid .murconsent-admin__field:nth-child(7) {
+    grid-column: 1 / -1;
+}
+
+.murconsent-admin__remove:disabled {
+    cursor: not-allowed;
+    opacity: .45;
+}
+
+@media (max-width: 760px) {
+    .murconsent-admin__service-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .murconsent-admin__service-grid .murconsent-admin__field {
+        grid-column: auto;
+    }
+}
+
+.murconsent-admin__integration {
+    max-width: 920px;
+    margin: 18px 0;
+    padding: 16px 18px;
+    border: 1px solid #d8dadd;
+    border-radius: 8px;
+    background: #f7f8f9;
+}
+
+.murconsent-admin__integration > h3 {
+    margin-top: 0;
+}
+
+.murconsent-admin__integration > .murconsent-admin__field:last-child,
+.murconsent-admin__suboptions > .murconsent-admin__field:last-of-type {
+    margin-bottom: 0;
+}
+
+.murconsent-admin__suboptions {
+    margin-top: 14px;
+    padding: 14px 16px;
+    border-left: 4px solid #77828a;
+    background: #fff;
+}
+
+.murconsent-admin__suboptions > p:first-child {
+    margin-top: 0;
+}
+
+/* MurCMS-native administration layout. */
+.murconsent-admin__hero code { white-space: nowrap; }
+.murconsent-admin__stats strong { font-size: 1.05rem; overflow-wrap: anywhere; }
+.murconsent-admin__tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 0 0 18px;
+    padding: 6px;
+    border: 1px solid #d8dee8;
+    border-radius: 10px;
+    background: #f5f7fa;
+}
+.murconsent-admin__tab-button {
+    min-height: 38px;
+    padding: 8px 13px;
+    border: 1px solid transparent;
+    border-radius: 7px;
+    background: transparent;
+    color: #263244;
+    cursor: pointer;
+    font: 650 14px/1.2 system-ui, sans-serif;
+}
+.murconsent-admin__tab-button[aria-selected="true"] {
+    border-color: #b9c3d2;
+    background: #fff;
+    box-shadow: 0 1px 4px rgba(15, 23, 42, .08);
+}
+.murconsent-admin__tab-button:focus-visible { outline: 3px solid #2563eb; outline-offset: 2px; }
+.murconsent-admin__panels { min-width: 0; }
+.murconsent-admin__tab { padding: 0; border: 0; background: transparent; }
+.murconsent-admin__tab[hidden] { display: none !important; }
+.murconsent-admin__tab h2 { margin-top: 0; }
+.murconsent-admin label:not(.admin-check) { display: grid; gap: 6px; min-width: 0; font-weight: 650; }
+.murconsent-admin label:not(.admin-check) > input,
+.murconsent-admin label:not(.admin-check) > textarea,
+.murconsent-admin label:not(.admin-check) > select {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    font-weight: 400;
+}
+.murconsent-admin .admin-check { display: flex; gap: 8px; align-items: flex-start; margin: 10px 0; }
+.murconsent-admin .admin-check input { margin-top: 3px; }
+.murconsent-admin__integration { max-width: none; }
+.murconsent-admin__service-card { margin-bottom: 14px; }
+.murconsent-admin__service-head { display: flex; gap: 12px; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.murconsent-admin__services > .admin-button { margin-top: 4px; }
+.murconsent-admin__save {
+    position: sticky;
+    bottom: 0;
+    z-index: 3;
+    display: flex;
+    justify-content: flex-end;
+    margin: 22px -20px -20px;
+    padding: 14px 20px;
+    border-top: 1px solid #d8dee8;
+    background: rgba(255,255,255,.96);
+    backdrop-filter: blur(8px);
+}
+.murconsent-admin__diagnostics { display: grid; gap: 10px; }
+.murconsent-admin__diagnostic { padding: 13px 15px; border: 1px solid #d8dee8; border-left-width: 5px; border-radius: 8px; background: #fff; }
+.murconsent-admin__diagnostic p { margin: 6px 0 0; }
+.murconsent-admin__diagnostic--error { border-left-color: #b42318; }
+.murconsent-admin__diagnostic--warning { border-left-color: #b7791f; }
+.murconsent-admin__diagnostic--info { border-left-color: #2563eb; }
+.murconsent-admin__diagnostic ul { margin-bottom: 0; }
+@media (max-width: 720px) {
+    .murconsent-admin__tabs { flex-wrap: nowrap; overflow-x: auto; }
+    .murconsent-admin__tab-button { flex: 0 0 auto; }
+    .murconsent-admin__language-body { padding: 14px; }
+    .murconsent-admin__save { margin-inline: -14px; padding-inline: 14px; }
+}
+
+/* MurConsent 1.0.1: dashboard cards show the value prominently and the label compactly. */
+.murconsent-admin__stats .admin-card > strong {
+    display: block;
+    font-size: clamp(2rem, 2.8vw, 3rem);
+    font-weight: 500;
+    line-height: 1.08;
+    overflow-wrap: anywhere;
+}
+
+.murconsent-admin__stats .admin-card > span {
+    display: block;
+    margin-top: 10px;
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.25;
+}
+
+
+/* MurConsent 1.0.3: content editor and service rows. */
+.murconsent-admin__content-pairs {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+}
+.murconsent-admin__content-pair {
+    display: grid;
+    align-content: start;
+    gap: 14px;
+    min-width: 0;
+}
+.murconsent-admin__content-pair > label { margin: 0; }
+.murconsent-admin__service-fields { display: grid; gap: 10px; }
+.murconsent-admin label.murconsent-admin__field-row {
+    display: grid;
+    grid-template-columns: minmax(190px, 28%) minmax(0, 1fr);
+    gap: 14px;
+    align-items: center;
+    margin: 0;
+}
+.murconsent-admin label.murconsent-admin__field-row > span {
+    min-width: 0;
+    font-weight: 650;
+}
+.murconsent-admin label.murconsent-admin__field-row > input[type="text"] {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    font-weight: 400;
+}
+.murconsent-admin__stats .admin-card.murconsent-admin__stat-text > strong {
+    font-size: clamp(1.25rem, 1.7vw, 1.65rem);
+    font-weight: 650;
+    line-height: 1.2;
+}
+@media (max-width: 760px) {
+    .murconsent-admin__content-pairs { grid-template-columns: 1fr; }
+    .murconsent-admin label.murconsent-admin__field-row {
+        grid-template-columns: 1fr;
+        gap: 6px;
+        align-items: stretch;
+    }
+}

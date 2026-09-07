@@ -1,0 +1,193 @@
+.mur-block-title {
+  margin: 0;
+  font-size: clamp(1.7rem, 3vw, 2.4rem);
+  line-height: 1.1;
+}
+
+.mur-counters,
+.mur-carousel,
+.mur-logos {
+  margin: 3rem 0;
+}
+
+.mur-counters-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1px;
+  overflow: hidden;
+  border: 1px solid var(--line, #d6e0e5);
+  border-radius: 8px;
+  background: var(--line, #d6e0e5);
+}
+
+.mur-counter {
+  display: grid;
+  gap: 0.4rem;
+  min-width: 0;
+  padding: clamp(1.1rem, 3vw, 1.8rem);
+  background: var(--surface, #fff);
+  text-align: center;
+}
+
+.mur-counter strong {
+  color: var(--ink, #0f1c22);
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  line-height: 1;
+}
+
+.mur-counter-label {
+  color: var(--muted, #5d6b73);
+}
+
+.mur-carousel-header {
+  display: flex;
+  gap: 1.2rem;
+  align-items: end;
+  justify-content: space-between;
+  margin-bottom: 1.2rem;
+}
+
+.mur-carousel-header p {
+  max-width: 42rem;
+  margin: 0.55rem 0 0;
+  color: var(--muted, #5d6b73);
+}
+
+.mur-carousel-shell {
+  position: relative;
+}
+
+.mur-carousel-track {
+  display: grid;
+  grid-auto-columns: minmax(15rem, 31%);
+  grid-auto-flow: column;
+  gap: 1rem;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  padding: 0.15rem 0 0.9rem;
+  scroll-padding-inline: 0;
+  scroll-snap-type: inline mandatory;
+  scrollbar-width: thin;
+}
+
+.mur-carousel-track:focus-visible {
+  outline: 3px solid var(--accent-soft, #dff3ec);
+  outline-offset: 4px;
+}
+
+.mur-carousel-item {
+  min-width: 0;
+  scroll-snap-align: start;
+}
+
+.mur-card {
+  display: grid;
+  gap: 0.7rem;
+  height: 100%;
+  min-height: 10rem;
+  padding: 1rem;
+  border: 1px solid var(--line, #d6e0e5);
+  border-radius: 8px;
+  background: var(--surface, #fff);
+  color: var(--text, #162026);
+  text-decoration: none;
+  box-shadow: var(--shadow, 0 16px 40px rgba(20, 36, 44, 0.08));
+}
+
+.mur-card:hover {
+  border-color: var(--accent, #0d7c66);
+}
+
+.mur-card img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  border-radius: 6px;
+  background: #eef2f6;
+}
+
+.mur-card h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  line-height: 1.2;
+}
+
+.mur-card p {
+  margin: 0;
+  color: var(--muted, #5d6b73);
+}
+
+.mur-carousel-button {
+  position: absolute;
+  top: 50%;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 1px solid var(--line, #d6e0e5);
+  border-radius: 999px;
+  background: var(--surface, #fff);
+  color: var(--text, #162026);
+  cursor: pointer;
+  font-size: 1.8rem;
+  line-height: 1;
+  transform: translateY(-50%);
+}
+
+.mur-carousel-button:disabled {
+  cursor: default;
+  opacity: 0.35;
+}
+
+.mur-carousel-button-prev {
+  left: -0.9rem;
+}
+
+.mur-carousel-button-next {
+  right: -0.9rem;
+}
+
+.mur-logos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.mur-logo {
+  display: grid;
+  place-items: center;
+  min-height: 5.5rem;
+  padding: 1rem;
+  border: 1px solid var(--line, #d6e0e5);
+  border-radius: 8px;
+  background: var(--surface, #fff);
+}
+
+.mur-logo img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+@media (max-width: 760px) {
+  .mur-counters-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .mur-carousel-header {
+    display: grid;
+    align-items: start;
+  }
+
+  .mur-carousel-track {
+    grid-auto-columns: minmax(14rem, 82%);
+  }
+
+  .mur-carousel-button {
+    display: none;
+  }
+}

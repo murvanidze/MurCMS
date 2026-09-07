@@ -1,0 +1,958 @@
+/* Memorial Elegant: a restrained, serif editorial theme for Parastas.md. */
+.ts-memorial-elegant {
+  color-scheme: light;
+  --bg: #f1f1ef;
+  --surface: #ffffff;
+  --surface-soft: #f7f7f4;
+  --text: #262624;
+  --muted: #67645f;
+  --line: #d7d4ce;
+  --line-strong: #aaa69e;
+  --accent: #9a7418;
+  --accent-strong: #74540d;
+  --accent-soft: #f3ead0;
+  --ink: #171716;
+  --hero: #242423;
+  --hero-muted: #d7d3ca;
+  --shadow: none;
+  background: var(--bg);
+  font-family: Georgia, "Times New Roman", Times, serif;
+  font-size: 17px;
+  line-height: 1.68;
+  text-rendering: optimizeLegibility;
+}
+
+.ts-memorial-elegant h1,
+.ts-memorial-elegant h2,
+.ts-memorial-elegant h3 {
+  color: var(--ink);
+  font-family: Georgia, "Times New Roman", Times, serif;
+  font-weight: 400;
+  letter-spacing: -0.018em;
+  text-wrap: balance;
+}
+
+.ts-memorial-elegant h2 {
+  margin: 1.8em 0 0.55em;
+  font-size: clamp(27px, 3.5vw, 39px);
+  line-height: 1.12;
+}
+
+.ts-memorial-elegant h3 {
+  margin: 1.5em 0 0.5em;
+  font-size: clamp(21px, 2.4vw, 27px);
+  line-height: 1.2;
+}
+
+.ts-memorial-elegant p,
+.ts-memorial-elegant ul,
+.ts-memorial-elegant ol {
+  text-wrap: pretty;
+}
+
+.ts-memorial-elegant a {
+  color: var(--accent-strong);
+  text-underline-offset: 0.16em;
+  text-decoration-thickness: 1px;
+}
+
+.ts-memorial-elegant a:hover {
+  color: var(--accent);
+}
+
+.ts-memorial-elegant a:focus-visible,
+.ts-memorial-elegant button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.ts-memorial-elegant ::selection {
+  background: var(--accent-soft);
+  color: var(--ink);
+}
+
+.ts-memorial-elegant img {
+  max-width: 100%;
+}
+
+/* Header and navigation */
+.ts-memorial-elegant .site-header {
+  min-height: 70px;
+  padding-top: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+  background: #fff;
+  backdrop-filter: none;
+}
+
+.ts-memorial-elegant .site-brand a {
+  color: var(--ink);
+  font-family: Georgia, "Times New Roman", Times, serif;
+  font-size: 22px;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+}
+
+.ts-memorial-elegant .site-menu a,
+.ts-memorial-elegant .language-current {
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 0.015em;
+}
+
+.ts-memorial-elegant .site-menu a {
+  padding-right: 7px;
+  padding-left: 7px;
+  color: #373531;
+}
+
+.ts-memorial-elegant .site-menu a:hover,
+.ts-memorial-elegant .site-menu .is-active > a,
+.ts-memorial-elegant .site-menu .is-active > .site-menu-row > a {
+  color: var(--accent-strong);
+  font-weight: 400;
+}
+
+.ts-memorial-elegant .site-menu .is-active > a,
+.ts-memorial-elegant .site-menu .is-active > .site-menu-row > a {
+  text-decoration: underline;
+  text-decoration-color: var(--accent);
+  text-underline-offset: 5px;
+}
+
+.ts-memorial-elegant .site-menu ul,
+.ts-memorial-elegant .language-menu-list {
+  border-color: var(--line);
+  border-radius: 0;
+  background: #fff;
+  box-shadow: none;
+}
+
+.ts-memorial-elegant .site-menu ul {
+  min-width: 220px;
+  padding: 10px 12px;
+  border-top: 2px solid var(--accent);
+}
+
+.ts-memorial-elegant .site-menu ul a {
+  padding: 7px 4px;
+}
+
+@media (min-width: 761px) {
+  .ts-memorial-elegant .site-menu ul ul {
+    border-top: 1px solid var(--line);
+    border-left: 2px solid var(--accent);
+  }
+
+  .ts-memorial-elegant .site-menu > .menu-mega > ul {
+    padding: 16px 18px;
+  }
+
+  .ts-memorial-elegant .site-menu > .menu-mega > ul > .has-children > ul {
+    padding-top: 5px;
+    border: 0;
+  }
+}
+
+.ts-memorial-elegant .site-menu-toggle,
+.ts-memorial-elegant .language-toggle {
+  border-color: var(--line-strong);
+  border-radius: 0;
+  background: #fff;
+}
+
+.ts-memorial-elegant .site-menu-toggle span {
+  border-radius: 0;
+}
+
+.ts-memorial-elegant .language-menu-list a {
+  border-radius: 0;
+  font-size: 14px;
+}
+
+.ts-memorial-elegant .language-menu-list a:hover {
+  background: var(--surface-soft);
+}
+
+/* Page frame and lead areas */
+.ts-memorial-elegant .site-main {
+  width: min(calc(100% - 32px), calc(var(--site-width, 1040px) + 96px));
+  padding: 0 48px 72px;
+  background: var(--bg);
+}
+
+.ts-memorial-elegant .home-hero {
+  margin: 0 -48px;
+  padding: clamp(58px, 9vw, 104px) 48px clamp(54px, 8vw, 88px);
+  border: 0;
+  border-bottom: 3px solid var(--accent);
+  background: var(--hero);
+  color: #fff;
+}
+
+.ts-memorial-elegant .home-hero::before {
+  display: block;
+  width: 46px;
+  margin-bottom: 28px;
+  border-top: 1px solid var(--accent);
+  content: "";
+}
+
+.ts-memorial-elegant .home-hero h1 {
+  max-width: 900px;
+  margin: 0 0 20px;
+  color: #fff;
+  font-size: clamp(42px, 7vw, 76px);
+  font-weight: 400;
+  letter-spacing: -0.035em;
+  line-height: 0.98;
+}
+
+.ts-memorial-elegant .home-hero p {
+  max-width: 760px;
+  margin: 0;
+  color: var(--hero-muted);
+  font-size: clamp(18px, 2.2vw, 23px);
+  line-height: 1.55;
+}
+
+.ts-memorial-elegant .hero-actions,
+.ts-memorial-elegant .button-row {
+  gap: 14px 20px;
+}
+
+.ts-memorial-elegant .hero-actions {
+  margin-top: 32px;
+}
+
+.ts-memorial-elegant .button {
+  min-height: 44px;
+  padding: 9px 17px;
+  border-color: var(--accent);
+  border-radius: 0;
+  background: var(--accent);
+  color: #fff;
+  font-family: Georgia, "Times New Roman", Times, serif;
+  font-weight: 400;
+}
+
+.ts-memorial-elegant .button:hover {
+  border-color: var(--accent-strong);
+  background: var(--accent-strong);
+}
+
+.ts-memorial-elegant .button-ghost {
+  border-color: var(--accent-strong);
+  background: transparent;
+  color: var(--accent-strong);
+}
+
+.ts-memorial-elegant .button-ghost:hover {
+  background: var(--accent-soft);
+  color: var(--ink);
+}
+
+.ts-memorial-elegant .home-hero .button-ghost {
+  border-color: #d8d3c8;
+  color: #fff;
+}
+
+.ts-memorial-elegant .home-hero .button-ghost:hover {
+  border-color: #fff;
+  background: #fff;
+  color: var(--hero);
+}
+
+.ts-memorial-elegant .breadcrumbs {
+  margin: 0;
+  padding-top: 24px;
+  font-size: 13px;
+  font-style: italic;
+}
+
+.ts-memorial-elegant .breadcrumbs li + li::before {
+  color: var(--line-strong);
+  content: "·";
+}
+
+.ts-memorial-elegant .page-header {
+  margin-bottom: 36px;
+  padding: 46px 0 28px;
+  border-bottom-color: var(--line-strong);
+}
+
+.ts-memorial-elegant .page-header h1 {
+  max-width: 900px;
+  font-size: clamp(36px, 5.2vw, 58px);
+  font-weight: 400;
+  letter-spacing: -0.025em;
+  line-height: 1.04;
+}
+
+.ts-memorial-elegant .page-header p {
+  max-width: 760px;
+  color: var(--muted);
+  font-size: 19px;
+  font-style: italic;
+  line-height: 1.55;
+}
+
+/* Long-form editorial content */
+.ts-memorial-elegant .page-content > p,
+.ts-memorial-elegant .page-content > ul,
+.ts-memorial-elegant .page-content > ol,
+.ts-memorial-elegant .page-content > blockquote,
+.ts-memorial-elegant .page-content > table,
+.ts-memorial-elegant .page-content > pre,
+.ts-memorial-elegant .page-content > details {
+  max-width: 820px;
+}
+
+.ts-memorial-elegant blockquote {
+  margin: 30px 0;
+  padding: 4px 0 4px 24px;
+  border-left: 3px solid var(--accent);
+  color: #3f3d38;
+  font-style: italic;
+}
+
+.ts-memorial-elegant blockquote p:first-child {
+  margin-top: 0;
+}
+
+.ts-memorial-elegant blockquote p:last-child {
+  margin-bottom: 0;
+}
+
+.ts-memorial-elegant hr {
+  height: 0;
+  margin: 42px 0;
+  border: 0;
+  border-top: 1px solid var(--line-strong);
+}
+
+.ts-memorial-elegant table {
+  width: 100%;
+  margin: 30px 0;
+  border-collapse: collapse;
+  background: var(--surface);
+  font-size: 15px;
+}
+
+.ts-memorial-elegant th,
+.ts-memorial-elegant td {
+  padding: 11px 12px;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+}
+
+.ts-memorial-elegant th {
+  border-bottom-color: var(--line-strong);
+  font-weight: 700;
+}
+
+.ts-memorial-elegant code,
+.ts-memorial-elegant pre {
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 0.86em;
+}
+
+.ts-memorial-elegant :not(pre) > code {
+  padding: 0.1em 0.25em;
+  background: #e9e8e3;
+}
+
+.ts-memorial-elegant pre {
+  overflow: auto;
+  padding: 18px;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  background: var(--surface);
+}
+
+.ts-memorial-elegant details {
+  padding: 16px 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.ts-memorial-elegant summary {
+  color: var(--ink);
+  cursor: pointer;
+  font-weight: 700;
+}
+
+/* Home page: white editorial modules separated by rules. */
+.ts-memorial-elegant .home-section,
+.ts-memorial-elegant .home-emergency {
+  border-bottom: 1px solid var(--line-strong);
+}
+
+.ts-memorial-elegant .home-section {
+  padding: 50px 0;
+}
+
+.ts-memorial-elegant .home-section > h2,
+.ts-memorial-elegant .home-section > .home-section-intro {
+  max-width: 790px;
+}
+
+.ts-memorial-elegant .home-section > h2 {
+  margin-top: 0;
+}
+
+.ts-memorial-elegant .home-section-intro {
+  margin-top: -0.25em;
+  color: var(--muted);
+  font-size: 18px;
+  font-style: italic;
+}
+
+.ts-memorial-elegant .home-emergency {
+  display: grid;
+  grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+  gap: 36px;
+  align-items: stretch;
+  padding: 50px 0;
+}
+
+.ts-memorial-elegant .home-emergency-panel,
+.ts-memorial-elegant .home-column,
+.ts-memorial-elegant .home-feature,
+.ts-memorial-elegant .home-wide {
+  border: 1px solid var(--line);
+  border-radius: 0;
+  background: var(--surface);
+  box-shadow: none;
+}
+
+.ts-memorial-elegant .home-emergency-panel {
+  padding: 30px;
+  border-top: 3px solid var(--accent);
+}
+
+.ts-memorial-elegant .home-emergency-panel h2 {
+  margin-top: 0;
+  font-size: clamp(27px, 3.5vw, 38px);
+}
+
+.ts-memorial-elegant .eyebrow {
+  margin: 0 0 13px;
+  color: var(--accent-strong);
+  font-size: 12px;
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.ts-memorial-elegant .home-link-list {
+  display: grid;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ts-memorial-elegant .home-link-list li {
+  border-bottom: 1px solid var(--line);
+}
+
+.ts-memorial-elegant .home-link-list li:last-child {
+  border-bottom: 0;
+}
+
+.ts-memorial-elegant .home-link-list a {
+  display: block;
+  position: relative;
+  padding: 11px 26px 11px 0;
+  color: var(--ink);
+  font-weight: 400;
+  line-height: 1.4;
+  text-decoration: none;
+}
+
+.ts-memorial-elegant .home-link-list a::after {
+  position: absolute;
+  right: 3px;
+  color: var(--accent);
+  content: "→";
+}
+
+.ts-memorial-elegant .home-link-list a:hover {
+  color: var(--accent-strong);
+}
+
+.ts-memorial-elegant .home-three-columns {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0;
+  margin-top: 28px;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.ts-memorial-elegant .home-column {
+  padding: 26px;
+  border-width: 0 1px 0 0;
+}
+
+.ts-memorial-elegant .home-column:last-child {
+  border-right: 0;
+}
+
+.ts-memorial-elegant .home-column h3,
+.ts-memorial-elegant .home-feature h2,
+.ts-memorial-elegant .home-wide h2 {
+  margin-top: 0;
+}
+
+.ts-memorial-elegant .home-column > p {
+  min-height: 5.1em;
+  color: var(--muted);
+}
+
+.ts-memorial-elegant .home-feature {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: 36px;
+  margin-top: 0;
+  padding: 30px;
+  border-left: 3px solid var(--accent);
+}
+
+.ts-memorial-elegant .home-feature > div > p:last-child,
+.ts-memorial-elegant .home-wide > p:not(.eyebrow) {
+  color: var(--muted);
+}
+
+.ts-memorial-elegant .home-wide {
+  margin-top: 0;
+  padding: 30px;
+  border-top: 3px solid var(--accent);
+}
+
+.ts-memorial-elegant .home-wide .home-link-list {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 28px;
+  margin-top: 22px;
+}
+
+/* Generic cards, listings and contact blocks */
+.ts-memorial-elegant .feature-grid,
+.ts-memorial-elegant .contact-panel {
+  gap: 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.ts-memorial-elegant .feature-grid article,
+.ts-memorial-elegant .contact-panel > div {
+  padding: 24px;
+  border: 0;
+  border-right: 1px solid var(--line);
+  border-radius: 0;
+  background: var(--surface);
+  box-shadow: none;
+}
+
+.ts-memorial-elegant .feature-grid article:last-child,
+.ts-memorial-elegant .contact-panel > div:last-child {
+  border-right: 0;
+}
+
+.ts-memorial-elegant .feature-grid h3,
+.ts-memorial-elegant .contact-panel h2 {
+  font-size: 22px;
+  font-weight: 400;
+}
+
+.ts-memorial-elegant .callout {
+  padding: 28px 30px;
+  border: 0;
+  border-top: 3px solid var(--accent);
+  border-radius: 0;
+  background: var(--hero);
+  color: #fff;
+}
+
+.ts-memorial-elegant .callout h2 {
+  color: #fff;
+}
+
+.ts-memorial-elegant .callout p {
+  color: var(--hero-muted);
+}
+
+.ts-memorial-elegant .content-list {
+  gap: 0;
+  border-top: 1px solid var(--line-strong);
+}
+
+.ts-memorial-elegant .content-list-cards {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.ts-memorial-elegant .content-list-item {
+  padding: 24px;
+  border: 0;
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
+  background: var(--surface);
+  box-shadow: none;
+}
+
+.ts-memorial-elegant .content-list-cards .content-list-item:nth-child(2n) {
+  border-right: 0;
+}
+
+.ts-memorial-elegant .content-list-titles .content-list-item {
+  padding: 16px 0;
+  border-right: 0;
+  background: transparent;
+}
+
+.ts-memorial-elegant .content-list-image {
+  margin: -24px -24px 20px;
+  overflow: hidden;
+  border-bottom: 1px solid var(--line);
+}
+
+.ts-memorial-elegant .content-list-title,
+.ts-memorial-elegant .content-list-titles .content-list-title {
+  font-family: Georgia, "Times New Roman", Times, serif;
+  font-size: 23px;
+  font-weight: 400;
+  line-height: 1.22;
+}
+
+.ts-memorial-elegant .content-list-title a {
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.ts-memorial-elegant .content-list-title a:hover {
+  color: var(--accent-strong);
+  text-decoration: underline;
+}
+
+.ts-memorial-elegant .content-list-description {
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.ts-memorial-elegant .content-list-date {
+  color: var(--muted);
+  font-size: 13px;
+  font-style: italic;
+}
+
+.ts-memorial-elegant .pagination-page,
+.ts-memorial-elegant .pagination-direction {
+  border-radius: 0;
+  background: transparent;
+}
+
+.ts-memorial-elegant .pagination a:hover,
+.ts-memorial-elegant .pagination a:focus-visible,
+.ts-memorial-elegant .pagination .is-current {
+  border-color: var(--accent);
+  background: var(--surface);
+}
+
+/* Tags and partner logos */
+.ts-memorial-elegant .mur-tag-cloud {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0;
+  margin-top: 24px;
+  border-top: 1px solid var(--line);
+  border-left: 1px solid var(--line);
+}
+
+.ts-memorial-elegant .mur-tag-cloud a {
+  padding: 7px 11px;
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.ts-memorial-elegant .mur-tag-cloud a:hover {
+  color: var(--accent-strong);
+}
+
+.ts-memorial-elegant .mur-logos-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0;
+  justify-content: center;
+}
+
+.ts-memorial-elegant .mur-logo {
+  width: auto;
+  min-width: 150px;
+  max-width: 220px;
+  min-height: 70px;
+  padding: 12px 18px;
+  border: 1px solid var(--line);
+  border-radius: 0;
+  background: #fff;
+  box-shadow: none;
+}
+
+.ts-memorial-elegant .mur-logo img {
+  max-width: 150px;
+  max-height: 54px;
+  object-fit: contain;
+}
+
+/* Footer: white information bands, black secondary navigation, white utility. */
+.ts-memorial-elegant .site-footer {
+  padding: 0;
+  border-top: 1px solid var(--line-strong);
+  background: #fff;
+  color: var(--muted);
+}
+
+.ts-memorial-elegant .footer-disclaimer,
+.ts-memorial-elegant .footer-partners,
+.ts-memorial-elegant .footer-utility {
+  width: min(calc(100% - 40px), var(--site-width, 1040px));
+  margin: 0 auto;
+  background: #fff;
+  color: var(--muted);
+}
+
+.ts-memorial-elegant .footer-disclaimer {
+  padding: 28px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 15px;
+  font-style: italic;
+  text-align: center;
+}
+
+.ts-memorial-elegant .footer-disclaimer p,
+.ts-memorial-elegant .footer-utility p {
+  margin: 0;
+}
+
+.ts-memorial-elegant .footer-partners {
+  padding: 28px 0;
+}
+
+.ts-memorial-elegant .footer-menu {
+  width: 100%;
+  margin: 0;
+  padding: 20px clamp(16px, 4vw, 48px);
+  border: 0;
+  background: #111;
+}
+
+.ts-memorial-elegant .footer-menu .site-menu {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 22px;
+  justify-content: center;
+  width: min(100%, var(--site-width, 1040px));
+  margin: 0 auto;
+}
+
+.ts-memorial-elegant .footer-menu .site-menu a {
+  padding: 0;
+  color: #d6d3cc;
+}
+
+.ts-memorial-elegant .footer-menu .site-menu a:hover,
+.ts-memorial-elegant .footer-menu .site-menu a:focus-visible {
+  color: #d3b45f;
+}
+
+.ts-memorial-elegant .footer-utility {
+  padding: 20px 0 26px;
+  font-size: 14px;
+  text-align: center;
+}
+
+.ts-memorial-elegant .footer-grid h2,
+.ts-memorial-elegant .footer-grid h3,
+.ts-memorial-elegant .footer-logo {
+  color: var(--ink);
+  font-family: Georgia, "Times New Roman", Times, serif;
+  font-weight: 400;
+}
+
+.ts-memorial-elegant .footer-map {
+  border-radius: 0;
+  box-shadow: none;
+}
+
+@media (max-width: 900px) {
+  .ts-memorial-elegant .site-header {
+    gap: 14px;
+    padding-right: 20px;
+    padding-left: 20px;
+  }
+
+  .ts-memorial-elegant .site-menu,
+  .ts-memorial-elegant .site-menu ul {
+    gap: 5px;
+  }
+
+  .ts-memorial-elegant .site-menu a {
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 760px) {
+  .ts-memorial-elegant {
+    font-size: 16px;
+  }
+
+  .ts-memorial-elegant .site-header {
+    min-height: 66px;
+  }
+
+  .ts-memorial-elegant .site-nav {
+    border-top-color: var(--line);
+  }
+
+  .ts-memorial-elegant .site-menu li {
+    border-bottom-color: var(--line);
+  }
+
+  .ts-memorial-elegant .site-menu ul {
+    padding-left: 16px;
+    border-top: 0;
+  }
+
+  .ts-memorial-elegant .site-menu a {
+    font-size: 15px;
+  }
+
+  .ts-memorial-elegant .site-main {
+    width: 100%;
+    padding-right: 20px;
+    padding-left: 20px;
+  }
+
+  .ts-memorial-elegant .home-hero {
+    margin-right: -20px;
+    margin-left: -20px;
+    padding-right: 20px;
+    padding-left: 20px;
+  }
+
+  .ts-memorial-elegant .home-emergency,
+  .ts-memorial-elegant .home-feature,
+  .ts-memorial-elegant .home-three-columns,
+  .ts-memorial-elegant .home-wide .home-link-list,
+  .ts-memorial-elegant .feature-grid,
+  .ts-memorial-elegant .contact-panel {
+    grid-template-columns: 1fr;
+  }
+
+  .ts-memorial-elegant .home-emergency {
+    gap: 24px;
+  }
+
+  .ts-memorial-elegant .home-emergency-panel,
+  .ts-memorial-elegant .home-feature,
+  .ts-memorial-elegant .home-wide,
+  .ts-memorial-elegant .home-column {
+    padding: 22px;
+  }
+
+  .ts-memorial-elegant .home-column {
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .ts-memorial-elegant .home-column:last-child {
+    border-bottom: 0;
+  }
+
+  .ts-memorial-elegant .home-column > p {
+    min-height: 0;
+  }
+
+  .ts-memorial-elegant .home-feature {
+    gap: 22px;
+  }
+
+  .ts-memorial-elegant .feature-grid article,
+  .ts-memorial-elegant .contact-panel > div {
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .ts-memorial-elegant .feature-grid article:last-child,
+  .ts-memorial-elegant .contact-panel > div:last-child {
+    border-bottom: 0;
+  }
+
+  .ts-memorial-elegant .content-list-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .ts-memorial-elegant .content-list-cards .content-list-item {
+    border-right: 0;
+  }
+
+  .ts-memorial-elegant .callout {
+    padding: 24px 22px;
+  }
+
+  .ts-memorial-elegant table {
+    display: block;
+    overflow-x: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ts-memorial-elegant *,
+  .ts-memorial-elegant *::before,
+  .ts-memorial-elegant *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media print {
+  .ts-memorial-elegant {
+    background: #fff;
+    color: #000;
+    font-size: 11pt;
+  }
+
+  .ts-memorial-elegant .site-header,
+  .ts-memorial-elegant .site-footer,
+  .ts-memorial-elegant .hero-actions,
+  .ts-memorial-elegant .pagination {
+    display: none;
+  }
+
+  .ts-memorial-elegant .site-main {
+    width: 100%;
+    padding: 0;
+    background: #fff;
+  }
+
+  .ts-memorial-elegant .home-hero,
+  .ts-memorial-elegant .callout {
+    background: #fff;
+    color: #000;
+  }
+
+  .ts-memorial-elegant .home-hero h1,
+  .ts-memorial-elegant .home-hero p,
+  .ts-memorial-elegant .callout h2,
+  .ts-memorial-elegant .callout p {
+    color: #000;
+  }
+}

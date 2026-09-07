@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 330 247" role="img" aria-labelledby="title desc">
+  <title id="title">Beaver by the water</title>
+  <desc id="desc">A lightweight local SVG illustration used as a gallery demo image.</desc>
+  <defs>
+    <linearGradient id="sky" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0" stop-color="#d8f0f5"/>
+      <stop offset="1" stop-color="#eef6ef"/>
+    </linearGradient>
+    <linearGradient id="water" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#7ab7c6"/>
+      <stop offset="1" stop-color="#2d7d8a"/>
+    </linearGradient>
+  </defs>
+  <rect width="330" height="247" fill="url(#sky)"/>
+  <path d="M0 158c52-14 94 14 145 0s101-18 185 6v83H0z" fill="url(#water)"/>
+  <path d="M0 176c52 12 110 10 168-4 55-13 102-11 162 7v68H0z" fill="#4f98a5" opacity=".52"/>
+  <path d="M42 147c26-22 69-31 119-26 41 4 76 18 113 17 20-1 38-7 56-17v41c-40 15-82 17-124 6-48-13-99-18-164 3z" fill="#8eb56f"/>
+  <ellipse cx="164" cy="145" rx="62" ry="42" fill="#7a4f37"/>
+  <ellipse cx="206" cy="134" rx="30" ry="28" fill="#81583e"/>
+  <circle cx="218" cy="128" r="4" fill="#142026"/>
+  <circle cx="220" cy="127" r="1.2" fill="#fff"/>
+  <path d="M226 139c8 3 16 2 23-4" fill="none" stroke="#3e2a20" stroke-width="4" stroke-linecap="round"/>
+  <ellipse cx="112" cy="155" rx="30" ry="12" fill="#5b3828" transform="rotate(-12 112 155)"/>
+  <path d="M167 168c21 11 43 12 68 0" fill="none" stroke="#5a3929" stroke-width="8" stroke-linecap="round"/>
+  <path d="M34 184c47-9 91-7 135 8 41 13 87 13 139-4" fill="none" stroke="#d8f4f1" stroke-width="5" stroke-linecap="round" opacity=".75"/>
+  <path d="M46 207c35-7 69-5 102 6 38 13 82 12 132-2" fill="none" stroke="#c5ece8" stroke-width="4" stroke-linecap="round" opacity=".62"/>
+</svg>

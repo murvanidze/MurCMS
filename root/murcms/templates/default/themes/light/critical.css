@@ -1,0 +1,19 @@
+/* Inline: palette and final header paint for the first viewport. */
+.ts-light {
+  color-scheme: light;
+  --bg: #f7f9fb;
+  --surface: #ffffff;
+  --surface-soft: #eef5f3;
+  --text: #162026;
+  --muted: #5d6b73;
+  --line: #d6e0e5;
+  --accent: #0d7c66;
+  --accent-strong: #075746;
+  --accent-soft: #dff3ec;
+  --ink: #0f1c22;
+  --shadow: 0 16px 40px rgba(20, 36, 44, 0.08);
+}
+
+.ts-light .site-header {
+  background: rgba(255, 255, 255, 0.92);
+}

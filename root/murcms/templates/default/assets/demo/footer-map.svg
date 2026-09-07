@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="150" viewBox="0 0 320 150" role="img" aria-labelledby="title">
+  <title id="title">Map placeholder</title>
+  <rect width="320" height="150" rx="8" fill="#e8f1ee"/>
+  <path d="M0 104 C42 78 74 90 111 65 C154 36 188 57 224 34 C258 12 288 25 320 10 L320 150 L0 150 Z" fill="#cfe5dc"/>
+  <path d="M0 58 L320 118" stroke="#ffffff" stroke-width="10" stroke-linecap="round"/>
+  <path d="M54 0 L108 150" stroke="#ffffff" stroke-width="8" stroke-linecap="round"/>
+  <path d="M188 0 L165 150" stroke="#ffffff" stroke-width="8" stroke-linecap="round"/>
+  <circle cx="210" cy="70" r="18" fill="#0d7c66"/>
+  <path d="M210 34 C226 34 239 47 239 63 C239 86 210 118 210 118 C210 118 181 86 181 63 C181 47 194 34 210 34 Z" fill="#075746"/>
+  <circle cx="210" cy="63" r="10" fill="#ffffff"/>
+</svg>

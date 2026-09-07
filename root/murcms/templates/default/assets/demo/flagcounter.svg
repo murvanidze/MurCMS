@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="468" height="60" viewBox="0 0 468 60" role="img" aria-labelledby="title desc">
+  <title id="title">Responsive flag counter placeholder</title>
+  <desc id="desc">Small footer image placeholder for country visit statistics.</desc>
+  <rect width="468" height="60" rx="8" fill="#f3f7f8"/>
+  <rect x="1" y="1" width="466" height="58" rx="7" fill="none" stroke="#d6e0e5"/>
+  <g font-family="Arial, sans-serif" font-size="12" fill="#5d6b73">
+    <text x="18" y="22" font-weight="700" fill="#162026">Flag counter</text>
+    <text x="18" y="42">responsive local placeholder</text>
+  </g>
+  <g transform="translate(230 13)">
+    <rect width="42" height="28" rx="3" fill="#ffffff" stroke="#d6e0e5"/>
+    <rect width="14" height="28" rx="3" fill="#0057b8"/>
+    <rect x="14" width="14" height="28" fill="#ffd700"/>
+    <rect x="28" width="14" height="28" rx="3" fill="#d52b1e"/>
+  </g>
+  <g transform="translate(282 13)">
+    <rect width="42" height="28" rx="3" fill="#ffffff" stroke="#d6e0e5"/>
+    <rect width="14" height="28" rx="3" fill="#002b7f"/>
+    <rect x="14" width="14" height="28" fill="#fcd116"/>
+    <rect x="28" width="14" height="28" rx="3" fill="#ce1126"/>
+  </g>
+  <g transform="translate(334 13)">
+    <rect width="42" height="28" rx="3" fill="#ffffff" stroke="#d6e0e5"/>
+    <rect width="42" height="9.3" rx="3" fill="#ffffff"/>
+    <rect y="9.3" width="42" height="9.4" fill="#1f7a3b"/>
+    <rect y="18.7" width="42" height="9.3" rx="3" fill="#c8102e"/>
+  </g>
+  <g transform="translate(386 13)">
+    <rect width="42" height="28" rx="3" fill="#ffffff" stroke="#d6e0e5"/>
+    <rect width="42" height="14" rx="3" fill="#ffffff"/>
+    <rect y="14" width="42" height="14" rx="3" fill="#d4213d"/>
+  </g>
+</svg>

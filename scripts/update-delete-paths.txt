@@ -1,0 +1,5 @@
+# Paths are relative to the installed MurCMS document root.
+# Keep this list limited to obsolete package-managed code/assets under murcms/.
+
+murcms/plugins/example-footer-badge/
+murcms/plugins/murtext/assets/

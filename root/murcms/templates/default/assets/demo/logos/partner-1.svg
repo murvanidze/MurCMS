@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="180" height="90" viewBox="0 0 180 90" role="img" aria-labelledby="title">
+  <title id="title">Alpha partner logo</title>
+  <rect width="180" height="90" rx="10" fill="#ffffff"/>
+  <circle cx="52" cy="45" r="22" fill="#0d7c66"/>
+  <text x="86" y="51" font-family="Arial, sans-serif" font-size="22" font-weight="700" fill="#162026">ALPHA</text>
+</svg>

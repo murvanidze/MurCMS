@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="300" viewBox="0 0 480 300" role="img" aria-labelledby="title">
+  <title id="title">Corporate site card</title>
+  <rect width="480" height="300" rx="18" fill="#edf6f4"/>
+  <rect x="54" y="48" width="372" height="204" rx="14" fill="#ffffff" stroke="#c9deda"/>
+  <rect x="82" y="78" width="150" height="18" rx="9" fill="#0d7c66"/>
+  <rect x="82" y="118" width="250" height="12" rx="6" fill="#b8cbc7"/>
+  <rect x="82" y="144" width="205" height="12" rx="6" fill="#d4e1df"/>
+  <rect x="82" y="182" width="90" height="32" rx="6" fill="#0d7c66"/>
+  <rect x="300" y="112" width="76" height="76" rx="16" fill="#dff3ec"/>
+</svg>

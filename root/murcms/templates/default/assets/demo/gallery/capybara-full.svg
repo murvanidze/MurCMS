@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800" role="img" aria-labelledby="title">
+  <title id="title">Full-size capybara gallery demo image</title>
+  <rect width="1200" height="800" fill="#eaf4f1"/>
+  <rect y="520" width="1200" height="280" fill="#a8d6ce"/>
+  <ellipse cx="610" cy="430" rx="250" ry="155" fill="#9b7659"/>
+  <circle cx="790" cy="360" r="105" fill="#a47c5f"/>
+  <circle cx="760" cy="330" r="14" fill="#162026"/>
+  <circle cx="825" cy="333" r="14" fill="#162026"/>
+  <ellipse cx="810" cy="382" rx="35" ry="22" fill="#6f5141"/>
+  <path d="M325 560 C465 610 710 615 910 560" fill="none" stroke="#ffffff" stroke-width="20" stroke-linecap="round" opacity=".7"/>
+  <text x="600" y="705" text-anchor="middle" font-family="Arial, sans-serif" font-size="42" fill="#42665f">Full image 1200 x 800</text>
+</svg>

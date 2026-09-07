@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800" role="img" aria-labelledby="title">
+  <title id="title">Full-size cat gallery demo image</title>
+  <rect width="1200" height="800" fill="#f5efe6"/>
+  <rect x="70" y="70" width="1060" height="660" rx="36" fill="#ffffff" stroke="#e1d7c8" stroke-width="3"/>
+  <circle cx="610" cy="400" r="180" fill="#d9a06f"/>
+  <path d="M450 260 L520 110 L590 275 Z" fill="#c77f4c"/>
+  <path d="M630 275 L705 110 L770 270 Z" fill="#c77f4c"/>
+  <circle cx="548" cy="375" r="24" fill="#162026"/>
+  <circle cx="672" cy="375" r="24" fill="#162026"/>
+  <path d="M610 420 C585 455 635 455 610 420 Z" fill="#8d4d3d"/>
+  <path d="M535 470 C580 505 640 505 685 470" fill="none" stroke="#8d4d3d" stroke-width="12" stroke-linecap="round"/>
+  <text x="600" y="680" text-anchor="middle" font-family="Arial, sans-serif" font-size="42" fill="#5d4a3b">Full image 1200 x 800</text>
+</svg>
