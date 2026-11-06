@@ -55,6 +55,6 @@ if ($LASTEXITCODE -ne 0) { throw 'Package verification failed.' }
 $sums = foreach ($file in Get-ChildItem -LiteralPath $outputPaths.PackDir -File | Where-Object { $_.Extension -eq '.zip' -or $_.Name.EndsWith('.manifest.sha256') -or $_.Name -in @('RELEASE-COMMIT.txt', 'RELEASE-NOTES.md') } | Sort-Object Name) {
     '{0}  {1}' -f (Get-FileHash -LiteralPath $file.FullName -Algorithm SHA256).Hash.ToLowerInvariant(), $file.Name
 }
-$sums | Set-Content -LiteralPath (Join-Path $outputPaths.PackDir 'SHA256SUMS.txt') -Encoding UTF8
+[IO.File]::WriteAllText((Join-Path $outputPaths.PackDir 'SHA256SUMS.txt'), (($sums -join "`n") + "`n"), [Text.UTF8Encoding]::new($false))
 Write-Host "Release artifacts: $($outputPaths.PackDir)"
 Write-Host "Source commit: $commitHash"

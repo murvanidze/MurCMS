@@ -56,7 +56,7 @@ try {
                 }
             }
         } finally { $zip.Dispose() }
-        $manifest | Sort-Object | Set-Content -LiteralPath (Join-Path $ReleaseDirectory ($file.BaseName + '.manifest.sha256')) -Encoding UTF8
+        [IO.File]::WriteAllText((Join-Path $ReleaseDirectory ($file.BaseName + '.manifest.sha256')), ((($manifest | Sort-Object) -join "`n") + "`n"), [Text.UTF8Encoding]::new($false))
         if ($file.Name.EndsWith('-update.zip')) { Expand-Archive -LiteralPath $file.FullName -DestinationPath $stage -Force }
     }
     foreach ($relative in $sentinels) {
