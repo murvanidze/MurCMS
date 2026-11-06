@@ -14,6 +14,6 @@ if (!defined('MUR_CMS_BOOTSTRAPPED')) {
  */
 final class Version
 {
-    public const PLUGIN = '0.2.3';
+    public const PLUGIN = '0.2.4';
     public const DIALECT = 'murtext-1';
 }

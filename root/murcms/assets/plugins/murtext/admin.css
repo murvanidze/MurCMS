@@ -60,5 +60,16 @@
 }
 
 .murtext-help-content code {
-  white-space: nowrap;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.murtext-help-content { max-height: 70vh; overflow: auto; font-size: 13px; line-height: 1.4; }
+.murtext-help-content .admin-table th, .murtext-help-content .admin-table td { padding: 5px 7px; }
+.murtext-help-content .admin-table th { width: 130px; }
+.murtext-help-content .admin-table { min-width: 0; }
+.murtext-full-help { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 14px; line-height: 1.5; }
+@media (max-width: 600px) {
+  .murtext-help-content .admin-table th { width: 95px; }
+  .murtext-help-dialog { padding: 16px 10px; }
 }

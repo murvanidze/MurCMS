@@ -1,7 +1,7 @@
 # MurCMS admin: file and image manager
 
 Date: 2026-09-07
-Status: current MurCMS 0.4.1 behavior
+Status: current MurCMS 0.4.2 behavior
 
 ## Route
 

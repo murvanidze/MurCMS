@@ -1,12 +1,12 @@
 # Установка и обновление MurConsent
 
 Дата: 2026-09-07  
-Статус: актуальная инструкция MurConsent `1.0.3` для MurCMS `0.4.1`
+Статус: актуальная инструкция MurConsent `1.0.3` для MurCMS `0.4.2`
 
 ## Требования
 
-- MurCMS `0.4.1`;
-- PHP 8.5+ (host requirement MurCMS 0.4.1);
+- MurCMS `0.4.2`;
+- PHP 8.5+ (host requirement MurCMS 0.4.2);
 - включённый JavaScript в браузере посетителя;
 - HTTPS для установки cookie с флагом `Secure`;
 - права записи PHP в `data/config/` и `data/storage/backups/`.

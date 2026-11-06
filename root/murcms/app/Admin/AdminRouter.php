@@ -142,16 +142,17 @@ final class AdminRouter
 
         return match (true) {
             $route === 'dashboard' => $this->renderer->page('Dashboard', $this->dashboard(), $nav, $user, 'dashboard'),
-            $route === 'seo' => $this->renderer->page('SEO', $this->seoOverview(), $nav, $user, 'seo'),
+            $route === 'seo' => $this->renderer->page('SEO', $this->seoOverview($method, $user), $nav, $user, 'seo'),
             $route === 'seo/sitemap' => $this->renderer->page('XML-карта сайта', $this->seoSitemap($method, $user), $nav, $user, 'seo-sitemap'),
             $route === 'seo/robots' => $this->renderer->page('robots.txt', $this->seoRobots($method, $user), $nav, $user, 'seo-robots'),
             $route === 'seo/htaccess' => $this->renderer->page('.htaccess', $this->seoHtaccess($method, $user), $nav, $user, 'seo-htaccess'),
             $route === 'settings/site' => $this->renderer->page('Настройки сайта', $this->siteSettings($method, $user), $nav, $user, 'settings-site'),
             $route === 'settings/theme' || $route === 'template' => $this->renderer->page('Шаблон: общие настройки', $this->themeSettings($method, $user, 'general'), $nav, $user, 'template-general'),
+            $route === 'template/functions' => $this->renderer->page('PHP-функции', $this->siteFunctionsEditor($method, $user), $nav, $user, 'template-functions'),
             $route === 'template/home' => $this->renderer->page('Главная страница', $this->themeSettings($method, $user, 'home'), $nav, $user, 'template-home'),
             $route === 'template/footer' => $this->renderer->page('Футер', $this->themeSettings($method, $user, 'footer'), $nav, $user, 'template-footer'),
             $route === 'settings/theme/menu' => $this->renderer->page('Редактор меню', $this->genericFileEditor($method, $user, 'menus'), $nav, $user, 'template-general'),
-            $route === 'settings/languages' => $this->renderer->page('Настройки языков фронтенда', $this->languageSettings($method, $user), $nav, $user, 'settings-languages'),
+            $route === 'settings/languages' => $this->renderer->page('Настройки фронтенда', $this->languageSettings($method, $user), $nav, $user, 'settings-languages'),
             $route === 'settings/admin' => $this->renderer->page('Настройки админ-панели', $this->adminSettings($method, $user), $nav, $user, 'settings-admin'),
             $route === 'settings/profile' => $this->renderer->page('Мой профиль', $this->profileSettings($method, $user), $nav, $user, 'settings-profile'),
             $route === 'settings/users' => $this->renderer->page('Пользователи', $this->usersPage($user), $nav, $user, 'settings-users'),
@@ -181,6 +182,10 @@ final class AdminRouter
 
     private function requiredRole(string $route): string
     {
+        if ($route === 'template/functions') {
+            return 'super_admin';
+        }
+
         if ($route === 'settings/profile') {
             return 'editor';
         }
@@ -195,7 +200,7 @@ final class AdminRouter
         if (
             $route === 'plugins'
             || $route === 'seo'
-            || $route === 'content/snippets'
+            || str_starts_with($route, 'content/snippets')
             || str_starts_with($route, 'seo/')
             || str_starts_with($route, 'settings/')
             || $route === 'template'
@@ -238,12 +243,10 @@ final class AdminRouter
             [
                 'label' => 'Настройки',
                 'items' => [
-                    ['id' => 'settings-profile', 'label' => 'Мой профиль', 'url' => '/admin/settings/profile'],
                     ['id' => 'settings-site', 'label' => 'Сайт', 'url' => '/admin/settings/site', 'role' => 'admin'],
-                    ['id' => 'settings-languages', 'label' => 'Языки фронтенда', 'url' => '/admin/settings/languages', 'role' => 'admin'],
+                    ['id' => 'settings-languages', 'label' => 'Настройки фронтенда', 'url' => '/admin/settings/languages', 'role' => 'admin'],
                     ['id' => 'settings-admin', 'label' => 'Админка', 'url' => '/admin/settings/admin', 'role' => 'admin'],
                     ['id' => 'settings-users', 'label' => 'Пользователи', 'url' => '/admin/settings/users', 'role' => 'admin'],
-                    ['id' => 'plugins', 'label' => 'Плагины', 'url' => '/admin/plugins', 'role' => 'admin'],
                 ],
             ],
             [
@@ -251,6 +254,7 @@ final class AdminRouter
                 'items' => [
                     ['id' => 'template-general', 'label' => 'Общие настройки', 'url' => '/admin/template', 'role' => 'admin'],
                     ['id' => 'template-home', 'label' => 'Главная страница', 'url' => '/admin/template/home', 'role' => 'admin'],
+                    ['id' => 'template-functions', 'label' => 'PHP-функции', 'url' => '/admin/template/functions', 'role' => 'super_admin'],
                     ['id' => 'template-footer', 'label' => 'Футер', 'url' => '/admin/template/footer', 'role' => 'admin'],
                 ],
             ],
@@ -258,15 +262,12 @@ final class AdminRouter
 
         $pluginItems = $this->hooks->filter('admin.menu', [], ['user' => $user]);
 
-        if (is_array($pluginItems) && $pluginItems !== []) {
-            $groups[] = [
-                'label' => 'Плагины',
-                'items' => array_values(array_filter($pluginItems, function (array $item) use ($user): bool {
-                    $role = (string) ($item['role'] ?? 'editor');
-                    return $this->auth->can($user, $role);
-                })),
-            ];
-        }
+        $groups[] = [
+            'label' => 'Плагины',
+            'items' => array_merge([
+                ['id' => 'plugins', 'label' => 'Управление плагинами', 'url' => '/admin/plugins', 'role' => 'admin'],
+            ], is_array($pluginItems) ? $pluginItems : []),
+        ];
 
         foreach ($groups as &$group) {
             $group['items'] = array_values(array_filter($group['items'], function (array $item) use ($user): bool {
@@ -277,6 +278,86 @@ final class AdminRouter
         unset($group);
 
         return array_values(array_filter($groups, static fn (array $group): bool => ($group['items'] ?? []) !== []));
+    }
+
+    private function faviconField(string $surface): string
+    {
+        $key = 'favicon_' . $surface;
+        $current = mur_favicon($this->site, $surface);
+        return '<label>' . ($surface === 'admin' ? 'Admin favicon' : 'Favicon фронтенда') . '<input name="' . $key . '" value="' . mur_escape((string) ($this->site[$key] ?? '')) . '" placeholder="branding/favicon.svg"><span class="admin-help">Путь относительно uploads, PNG/SVG/WebP. ' . ($surface === 'frontend' ? 'Пустое поле: favicon* в корне uploads, затем иконка MurCMS.' : 'Пустое поле: иконка MurCMS.') . ' Сейчас: <code>' . mur_escape((string) ($current['url'] ?? '')) . '</code></span></label>';
+    }
+
+    private function saveFavicon(string $surface): void
+    {
+        $key = 'favicon_' . $surface;
+        if (isset($_POST[$key]) && is_string($_POST[$key])) {
+            $this->site[$key] = mur_favicon_config_path($_POST[$key]);
+            $this->writeConfigFile('config/site.php', $this->site);
+        }
+    }
+
+    private function siteFunctionsEditor(string $method, array $user): string
+    {
+        $template = \Mur\Core\TemplateManager::resolvedName(mur_engine_path('templates'), $this->themeConfig);
+        $functions = new \Mur\Core\SiteFunctions(mur_data_path(), $template);
+        $notice = '';
+        $submitted = null;
+        try {
+            if ($method === 'POST') {
+                $notice = $this->guardPost($user, 'super_admin');
+                if ($notice !== '') {
+                    return $notice;
+                }
+                if (($_POST['action'] ?? '') === 'restore') {
+                    $functions->restore();
+                    $notice = $this->notice('Предыдущая редакция восстановлена.');
+                } else {
+                    $submitted = (string) ($_POST['code'] ?? '');
+                    $functions->save($submitted);
+                    $notice = $this->notice('PHP-функции сохранены. Синтаксис проверен без исполнения.');
+                }
+            }
+            $code = $submitted ?? $functions->read();
+            $restore = $functions->hasBackup() ? '<button class="admin-button admin-button--ghost" name="action" value="restore" type="submit">Восстановить предыдущую редакцию</button>' : '';
+        } catch (\Throwable $exception) {
+            $notice = $this->notice($exception->getMessage(), true);
+            $code = $submitted ?? '';
+            $restore = '';
+        }
+        return $notice . '<section class="admin-panel"><h2>PHP-функции — ' . mur_escape($template) . '</h2><p><code>data/templates/' . mur_escape($template) . '/functions.php</code></p><p class="admin-help">Доверенный PHP только для super_admin. Подключается через require_once на публичном сайте перед шаблоном; админка этот файл не исполняет. Проверка синтаксиса не выявляет ошибки времени выполнения. Предыдущая редакция сохраняется вне дистрибутива.</p><form class="admin-form" method="post" action="/admin/template/functions"><input type="hidden" name="_csrf" value="' . mur_escape((string) $user['csrf']) . '"><label class="admin-field-full">PHP<textarea name="code" rows="24" spellcheck="false">' . mur_escape($code) . '</textarea></label><div class="admin-actions"><button class="admin-button" name="action" value="save" type="submit">Проверить и сохранить</button>' . $restore . '</div></form></section>';
+    }
+
+    private function updatedAtFields(array $meta): string
+    {
+        $timezone = (string) ($this->site['timezone'] ?? 'UTC');
+        $now = new \DateTimeImmutable('now', new \DateTimeZone($timezone));
+        $saved = \Mur\Core\DocumentDates::parse((string) ($meta['updated_at'] ?? ''), $timezone);
+        $date = $saved?->setTimezone(new \DateTimeZone($timezone)) ?? $now;
+        $fields = '';
+        foreach (['year' => ['Год', 'Y', 1, 9999], 'month' => ['Месяц', 'm', 1, 12], 'day' => ['День', 'd', 1, 31], 'hour' => ['Часы', 'H', 0, 23], 'minute' => ['Минуты', 'i', 0, 59], 'second' => ['Секунды', 's', 0, 59]] as $key => [$label, $format, $min, $max]) {
+            $value = (int) $date->format($format);
+            if ($key === 'year' || $key === 'second') {
+                $control = '<input name="updated[' . $key . ']" data-date-part="' . $key . '" type="number" min="' . $min . '" max="' . $max . '" step="1" value="' . $value . '">';
+            } else {
+                $options = [];
+                for ($i = $min; $i <= $max; $i++) {
+                    $options[(string) $i] = sprintf('%02d', $i);
+                }
+                $control = '<select name="updated[' . $key . ']" data-date-part="' . $key . '">' . $this->selectOptions($options, (string) $value) . '</select>';
+            }
+            $fields .= '<label>' . $label . $control . '</label>';
+        }
+        return '<fieldset class="admin-updated-at admin-field-full" data-updated-at data-timezone="' . mur_escape($timezone) . '" data-site-now="' . $now->getTimestamp() . '"><legend>Дата изменения</legend><div class="admin-date-fields">' . $fields . '</div><label class="admin-check"><input type="checkbox" name="update_updated_at" value="1" data-date-permission><span>Обновить дату изменения при сохранении</span></label><div class="admin-date-now"><button class="admin-button admin-button--ghost" type="button" data-date-now>Сейчас</button><span class="admin-help">Сейчас на сайте: <time data-site-clock>' . $now->format('Y-m-d H:i:s') . '</time> (' . mur_escape($timezone) . ')</span></div><p class="admin-help">Галочка разрешает запись показанных полей. Без неё сохранённая дата не меняется; отсутствующая дата создаётся при первом сохранении.</p></fieldset>';
+    }
+
+    private function documentModifiedCell(Document $document): string
+    {
+        $value = trim((string) ($document->meta['updated_at'] ?? ''));
+        if ($value !== '') {
+            return '<time>' . mur_escape($value) . '</time><small class="admin-help">updated_at</small>';
+        }
+        $mtime = is_file($document->filePath) ? filemtime($document->filePath) : false;
+        return ($mtime !== false ? mur_escape(date('Y-m-d H:i:s', $mtime)) : '—') . '<small class="admin-help">Файл · legacy fallback</small>';
     }
 
     private function dashboard(): string
@@ -387,7 +468,7 @@ final class AdminRouter
                 $rows .= '<tr data-document-id="' . mur_escape($document->id()) . '">' . $selectionCell . '<td class="admin-document-cell"><div class="admin-document-content admin-tree-depth-' . $treeDepth . '">' . $titleCell
                     . '<code class="admin-document-id">' . mur_escape($document->id()) . '</code>'
                     . '<a class="admin-document-url" href="' . mur_escape($url) . '" target="_blank" rel="noreferrer"><code>' . mur_escape($url) . '</code></a>'
-                    . '</div></td><td class="admin-document-status">' . $this->statusIcon($document->status()) . '</td><td class="admin-document-actions">' . $this->toolbar([
+                    . '</div></td>' . ($collection === 'pages' ? '<td class="admin-document-modified">' . $this->documentModifiedCell($document) . '</td>' : '') . '<td class="admin-document-status">' . $this->statusIcon($document->status()) . '</td><td class="admin-document-actions">' . $this->toolbar([
                     ['label' => 'Редактировать', 'url' => '/admin/content/' . $collection . '/edit?' . $query],
                     ['label' => 'Клонировать', 'url' => '/admin/content/' . $collection . '/clone?' . $query],
                     ['label' => 'Скачать', 'url' => '/admin/content/' . $collection . '/download?' . $query],
@@ -397,7 +478,7 @@ final class AdminRouter
             }
 
             if ($rows === '') {
-                $rows = '<tr><td colspan="' . ($pageBulkEnabled ? '4' : '3') . '">' . ($collection === 'pages' && $this->pageListFilterIsActive($pageFilter)
+                $rows = '<tr><td colspan="' . ($collection === 'pages' ? ($pageBulkEnabled ? '5' : '4') : '3') . '">' . ($collection === 'pages' && $this->pageListFilterIsActive($pageFilter)
                     ? 'Страницы по выбранному фильтру не найдены.'
                     : 'Документы этой языковой ветки пока не найдены.') . '</td></tr>';
             }
@@ -408,7 +489,7 @@ final class AdminRouter
                 : '';
             $sections .= '<section class="admin-panel admin-language-group" data-language="' . mur_escape((string) $language) . '">
   <div class="admin-panel-head"><h2>' . mur_escape($this->languageHeading($language)) . '</h2><a class="admin-button" href="' . mur_escape($newUrl) . '">' . $this->icon('add') . '<span>Создать</span></a></div>
-  <table class="admin-table admin-documents-table"><thead><tr>' . $selectionHeading . '<th>Страница</th><th>Статус</th><th>Действия</th></tr></thead><tbody>' . $rows . '</tbody></table>
+  <table class="admin-table admin-documents-table"><thead><tr>' . $selectionHeading . '<th>Страница</th>' . ($collection === 'pages' ? '<th>Изменено</th>' : '') . '<th>Статус</th><th>Действия</th></tr></thead><tbody>' . $rows . '</tbody></table>
 </section>';
         }
 
@@ -721,7 +802,7 @@ final class AdminRouter
 
     private function documentEditor(string $collection, string $method, array $user): string
     {
-        $notice = '';
+        $notice = isset($_GET['saved']) ? $this->notice('Документ сохранен.') : '';
 
         if ($method === 'POST') {
             $notice = $this->saveDocument($collection, $user);
@@ -732,6 +813,10 @@ final class AdminRouter
         $document = $id !== '' ? $this->content->findById($language, $id) : null;
         $meta = $document instanceof Document ? $document->meta : $this->defaultDocumentMeta($collection);
         $body = $document instanceof Document ? $document->body : '';
+        if ($method === 'POST') {
+            $meta = $this->postedDocumentMeta($collection, (string) ($_POST['id'] ?? ''), $language);
+            $body = (string) ($_POST['body'] ?? '');
+        }
         $url = $document instanceof Document ? '/' . $language . '/' . $document->urlPath : '';
         $back = '/admin/content/' . $collection;
         $isPage = $collection === 'pages';
@@ -762,9 +847,14 @@ final class AdminRouter
     <input type="hidden" name="_csrf" value="' . mur_escape((string) $user['csrf']) . '">
     <input type="hidden" name="original_id" value="' . mur_escape($id) . '">
     <input type="hidden" name="original_language" value="' . mur_escape($language) . '">
+      ' . $this->documentField('Заголовок', '<input id="field-title" name="title" value="' . mur_escape((string) ($meta['title'] ?? '')) . '" required>', 'Название ' . $entityName . ' в админке и основной заголовок на сайте.', 'field-title', $help) . '
+    ' . $editorTools . '
+    <label class="admin-field-full">Содержимое
+      <textarea name="body" rows="24" spellcheck="false">' . mur_escape($body) . '</textarea>
+      ' . $this->helpText('Основной текст в Markdown или HTML. Шорткоды размещайте отдельной строкой, например <code>[gallery=name]</code>.', $help) . '
+    </label>
     <fieldset class="admin-editor-section">
       <legend>Основные параметры</legend>
-      ' . $this->documentField('Заголовок', '<input id="field-title" name="title" value="' . mur_escape((string) ($meta['title'] ?? '')) . '" required>', 'Название ' . $entityName . ' в админке и основной заголовок на сайте.', 'field-title', $help) . '
       ' . $this->documentField('Адрес (slug)', '<input id="field-slug" name="slug" value="' . mur_escape((string) ($meta['slug'] ?? '')) . '" pattern="[A-Za-z0-9_\\-\\/]+">', 'Часть URL латиницей, например <code>about-company</code>. Если оставить пустым, используется ID.', 'field-slug', $help) . '
       ' . $this->documentField('Родитель', '<select id="field-parent" name="parent">' . $this->parentOptions($language, $collection, (string) ($meta['parent'] ?? ''), (string) ($meta['id'] ?? '')) . '</select>', $isPage ? 'Родительская страница задает вложенность URL. Например, страница с родителем <code>services</code> будет находиться внутри раздела услуг.' : 'Родительская категория задает положение в дереве рубрик. Она не назначает материалы в эту категорию.', 'field-parent', $help) . '
       ' . $this->documentField('Шаблон', '<select id="field-template" name="template">' . $this->templateOptions((string) ($meta['template'] ?? ($isPage ? 'page' : 'category')), $isPage) . '</select>', 'Определяет способ вывода. Обычная страница показывает текст, список дополнительно выводит подобранные материалы, категория представляет рубрику.', 'field-template', $help) . '
@@ -793,6 +883,7 @@ final class AdminRouter
       <summary>Служебные параметры</summary>
       <div class="admin-editor-disclosure__body">
       <div class="admin-form-grid admin-form-grid--compact">
+        ' . $this->updatedAtFields($meta) . '
         ' . $this->compactDocumentField('Язык', $this->languageSelect($language), 'Языковая ветка файла.', $help) . '
         ' . $this->compactDocumentField('Статус', '<select name="status">' . $this->statusOptions((string) ($meta['status'] ?? 'draft')) . '</select>', 'Опубликован или скрыт как черновик.', $help) . '
         ' . $this->compactDocumentField('ID', '<input name="id" value="' . mur_escape((string) ($meta['id'] ?? '')) . '" pattern="[A-Za-z0-9_-]+" required>', 'Стабильный технический идентификатор латиницей.', $help) . '
@@ -810,11 +901,6 @@ final class AdminRouter
         </label>
       </div>
     </details>
-    ' . $editorTools . '
-    <label class="admin-field-full">Содержимое
-      <textarea name="body" rows="24" spellcheck="false">' . mur_escape($body) . '</textarea>
-      ' . $this->helpText('Основной текст в Markdown или HTML. Шорткоды размещайте отдельной строкой, например <code>[gallery=name]</code>.', $help) . '
-    </label>
     <div class="admin-actions">
       <button class="admin-button" type="submit">' . $this->icon('save') . '<span>Сохранить</span></button>
       <a class="admin-button admin-button--ghost" href="' . mur_escape($back) . '">' . $this->icon('back') . '<span>Назад</span></a>
@@ -865,6 +951,18 @@ final class AdminRouter
             return $this->notice('Языковую ветку существующего документа нельзя изменять. Создайте перевод или копию.', true);
         }
 
+        try {
+            $oldUpdated = (string) ($original?->meta['updated_at'] ?? '');
+            unset($meta['updated_at']);
+            if (isset($_POST['update_updated_at'])) {
+                $meta['updated_at'] = \Mur\Core\DocumentDates::fromFields((array) ($_POST['updated'] ?? []), (string) ($this->site['timezone'] ?? 'UTC'));
+            } else {
+                $meta['updated_at'] = $oldUpdated !== '' ? $oldUpdated : date('Y-m-d H:i:s');
+            }
+        } catch (\InvalidArgumentException $exception) {
+            return $this->notice($exception->getMessage(), true);
+        }
+
         $originalFile = $original instanceof Document ? $original->filePath : '';
         $targetFile = mur_path('content/' . $language . '/' . $collection . '/' . $id . '.mur.md');
         $validationError = $this->documentCollisionError($collection, $language, $meta, $original, $targetFile);
@@ -885,6 +983,7 @@ final class AdminRouter
 
         $this->content->refresh();
 
+        $this->redirect('/admin/content/' . $collection . '/edit?lang=' . rawurlencode($language) . '&id=' . rawurlencode($id) . '&saved=1', 303);
         return $this->notice('Документ сохранен.');
     }
 
@@ -1493,30 +1592,37 @@ final class AdminRouter
         }
     }
 
-    private function seoOverview(): string
+    private function seoOverview(string $method, array $user): string
     {
+        $notice = '';
+        if ($method === 'POST') {
+            $notice = $this->guardPost($user);
+            if ($notice === '') {
+                $home = [];
+                $posted = is_array($_POST['home'] ?? null) ? $_POST['home'] : [];
+                foreach ($this->orderedLanguages() as $language) {
+                    $home[$language] = [];
+                    foreach (['title', 'description'] as $key) {
+                        $value = $posted[$language][$key] ?? '';
+                        $home[$language][$key] = is_string($value) ? trim($value) : '';
+                    }
+                }
+                $this->seo->saveHomeMeta($home);
+                $notice = $this->notice('SEO главной сохранено.');
+            }
+        }
+        $fields = '';
+        foreach ($this->orderedLanguages() as $language) {
+            $values = $this->seo->config()['home'][$language] ?? [];
+            $fields .= '<fieldset class="admin-editor-section"><legend>' . mur_escape($this->languageHeading($language)) . '</legend><label>Meta title<input name="home[' . mur_escape($language) . '][title]" value="' . mur_escape((string) ($values['title'] ?? '')) . '"></label><label>Meta description<textarea name="home[' . mur_escape($language) . '][description]" rows="3">' . mur_escape((string) ($values['description'] ?? '')) . '</textarea></label></fieldset>';
+        }
         $urls = $this->seo->sitemapUrls();
         $robots = $this->seo->robots();
 
-        return '<section class="admin-grid admin-grid--stats">
+        return $notice . '<section class="admin-panel"><h2>SEO главной по языкам</h2><p class="admin-help">Пустое поле: текущий язык → основной язык → системное название / описание сайта. Название сайта единое для всех языков.</p><form class="admin-form" method="post" action="/admin/seo"><input type="hidden" name="_csrf" value="' . mur_escape((string) $user['csrf']) . '">' . $fields . '<button class="admin-button" type="submit">Сохранить SEO главной</button></form></section><section class="admin-grid admin-grid--stats">
   <article class="admin-panel"><strong>' . count($urls) . '</strong><span>sitemap URLs</span></article>
   <article class="admin-panel"><strong>' . count($this->languages['enabled'] ?? []) . '</strong><span>languages</span></article>
   <article class="admin-panel"><strong>' . strlen($robots) . '</strong><span>robots.txt bytes</span></article>
-</section>
-<section class="admin-panel">
-  <h2>Идеи для SEO-раздела</h2>
-  <ul class="admin-list">
-    <li>Редактор title/description по страницам.</li>
-    <li>Массовая проверка пустых meta description.</li>
-    <li>JSON-LD настройки для Organization, LocalBusiness, BreadcrumbList.</li>
-    <li>Проверка canonical/hreflang по языкам.</li>
-    <li>Open Graph/Twitter Card defaults.</li>
-    <li>Redirects manager для 301/302.</li>
-  </ul>
-</section>
-<section class="admin-panel">
-  <h2>Статистика и Search Console</h2>
-  <p>Подключение Google Search Console возможно через API и OAuth, но это отдельный этап после стабилизации редакторов.</p>
 </section>';
     }
 
@@ -1564,6 +1670,7 @@ final class AdminRouter
     ' . $this->checkbox('include_home', 'Включать главные языковые страницы', ($settings['include_home'] ?? true) === true) . '
     ' . $this->checkbox('include_documents', 'Включать опубликованные документы, включая pages/categories/services/news/info', ($settings['include_documents'] ?? true) === true) . '
     ' . $this->checkbox('include_lastmod', 'Добавлять lastmod', ($settings['include_lastmod'] ?? false) === true) . '
+    ' . (($settings['include_lastmod'] ?? false) !== true ? '<p class="admin-help">Lastmod выключен: updated_at хранится в документах, но не выводится в sitemap. Включите эту настройку, если хотите публиковать даты правок.</p>' : '') . '
     <div class="admin-actions">
       <button class="admin-button" name="action" value="save" type="submit">Сохранить настройки</button>
       <button class="admin-button admin-button--ghost" name="action" value="snapshot" type="submit">Обновить snapshot</button>
@@ -1636,35 +1743,18 @@ final class AdminRouter
             if ($notice === '') {
                 $this->site['name'] = trim((string) ($_POST['name'] ?? $this->site['name'] ?? ''));
                 $this->site['description'] = trim((string) ($_POST['description'] ?? $this->site['description'] ?? ''));
-                $this->site['favicon_frontend'] = mur_favicon_config_path((string) ($_POST['favicon_frontend'] ?? ''));
-                $this->site['favicon_admin'] = mur_favicon_config_path((string) ($_POST['favicon_admin'] ?? ''));
                 $this->writeConfigFile('config/site.php', $this->site);
                 $notice = $this->notice('Настройки сайта сохранены.');
             }
         }
 
-        $frontendFavicon = mur_favicon($this->site, 'frontend');
-        $adminFavicon = mur_favicon($this->site, 'admin');
-
         return $notice . '<section class="admin-panel">
   <h2>Технические настройки</h2>
   <form class="admin-form" method="post" action="/admin/settings/site">
     <input type="hidden" name="_csrf" value="' . mur_escape((string) $user['csrf']) . '">
-    <label>Name<input name="name" value="' . mur_escape((string) ($this->site['name'] ?? '')) . '" required></label>
-    <label>Description<textarea name="description" rows="4">' . mur_escape((string) ($this->site['description'] ?? '')) . '</textarea></label>
-    <fieldset class="admin-editor-section">
-      <legend>Favicons</legend>
-      <label>Frontend favicon
-        <input name="favicon_frontend" value="' . mur_escape((string) ($this->site['favicon_frontend'] ?? '')) . '" placeholder="branding/site-icon.svg">
-      </label>
-      <p class="admin-help">Путь относительно <code>root/uploads/</code>. Если поле пустое или файл недоступен, CMS ищет в корне uploads первый по имени файл <code>favicon*.png</code>, <code>favicon*.svg</code> или <code>favicon*.webp</code>. Если ничего не найдено, используется стандартный favicon MurCMS.</p>
-      <p class="admin-help">Сейчас: <code>' . mur_escape((string) ($frontendFavicon['url'] ?? '')) . '</code></p>
-      <label>Admin favicon
-        <input name="favicon_admin" value="' . mur_escape((string) ($this->site['favicon_admin'] ?? '')) . '" placeholder="branding/admin-favicon.svg">
-      </label>
-      <p class="admin-help">Путь относительно <code>root/uploads/</code>. Автоматический поиск для админки не выполняется: пустое поле использует стандартный favicon MurCMS.</p>
-      <p class="admin-help">Сейчас: <code>' . mur_escape((string) ($adminFavicon['url'] ?? '')) . '</code></p>
-    </fieldset>
+    <label>Системное название сайта<input name="name" value="' . mur_escape((string) ($this->site['name'] ?? '')) . '" required></label>
+    <label>Описание по умолчанию<textarea name="description" rows="4">' . mur_escape((string) ($this->site['description'] ?? '')) . '</textarea></label>
+
     <button class="admin-button" type="submit">Сохранить</button>
   </form>
 </section>
@@ -1698,7 +1788,7 @@ final class AdminRouter
         }
 
         return $notice . '<section class="admin-panel">
-  <h2>' . mur_escape($this->t('Фронтовые языки')) . '</h2>
+  <h2>' . mur_escape($this->t('Языки')) . '</h2>
   <p>' . mur_escape($this->t('Эти языки используются публичным сайтом, URL, sitemap, меню и контентными папками. Они не связаны с языком интерфейса админки.')) . '</p>
   <form class="admin-form" method="post" action="/admin/settings/languages">
     <input type="hidden" name="_csrf" value="' . mur_escape((string) $user['csrf']) . '">
@@ -1711,6 +1801,9 @@ final class AdminRouter
     </label>
     <p>' . mur_escape($this->t('flexible: языковые версии могут отличаться по структуре.')) . '</p>
     <p>' . mur_escape($this->t('mirror: структура языковых версий должна совпадать, а админка позже сможет подсвечивать расхождения.')) . '</p>
+    <fieldset class="admin-editor-section"><legend>Favicon фронтенда</legend>
+      ' . $this->faviconField('frontend') . '
+    </fieldset>
     <button class="admin-button" type="submit">' . mur_escape($this->t('Сохранить языки')) . '</button>
   </form>
 </section>';
@@ -1745,6 +1838,7 @@ final class AdminRouter
     ' . $this->checkbox('help_enabled', 'Показывать пояснения и примеры в формах админки', $helpEnabled) . '
     <p class="admin-help">Режим помощи добавляет короткие подсказки под полями. Он меняет только интерфейс админки и не добавляет ничего в контент.</p>
     <p><strong>' . mur_escape($this->t('Доступные языки интерфейса')) . ':</strong> <code>' . mur_escape(implode(', ', $available)) . '</code></p>
+    ' . $this->faviconField('admin') . '
     <button class="admin-button" type="submit">' . mur_escape($this->t('Сохранить настройки админки')) . '</button>
   </form>
 </section>
@@ -2110,8 +2204,9 @@ final class AdminRouter
     <button class="admin-button" type="submit">Сохранить настройки шаблона</button>
   </form>
 </section>
-<section class="admin-panel">
-  <h2>Пользовательские CSS</h2>
+<details class="admin-panel admin-editor-disclosure">
+  <summary>Пользовательские CSS</summary>
+  <div class="admin-editor-disclosure__body">
   <p>Стили относятся только к шаблону <code>' . mur_escape($active) . '</code> и хранятся отдельно от файлов дистрибутива.</p>
   <form class="admin-form" method="post" action="/admin/template">
     <input type="hidden" name="_csrf" value="' . mur_escape((string) $user['csrf']) . '">
@@ -2127,7 +2222,8 @@ final class AdminRouter
     </label>
     <button class="admin-button" type="submit">Сохранить пользовательские CSS</button>
   </form>
-</section>
+  </div>
+</details>
 <section class="admin-panel">
   <h2>Меню</h2>
   <p>Файлы меню лежат в <code>root/data/menus/{lang}/</code>. Верхнее меню по умолчанию называется <code>main</code>, меню футера — <code>footer</code>.</p>
@@ -2456,100 +2552,90 @@ final class AdminRouter
 
     private function snippetsEditor(string $method, array $user): string
     {
-        $notice = '';
-
+        $notice = isset($_GET['saved']) ? $this->notice('Snippet сохранен.') : '';
         if ($method === 'POST') {
             $notice = $this->saveSnippet($user);
         }
-
-        $editLang = (string) ($_GET['lang'] ?? ($this->languages['default'] ?? 'ru'));
-        $editName = (string) ($_GET['name'] ?? '');
+        $editLang = (string) ($_GET['lang'] ?? $_POST['lang'] ?? ($this->languages['default'] ?? 'ru'));
+        $editName = (string) ($_GET['name'] ?? $_POST['name'] ?? '');
         $snippet = $this->loadSnippetForEdit($editLang, $editName);
-        $files = $this->snippetFiles();
-        $groups = [];
-        $systemSnippets = $this->systemSnippetDescriptions();
-
-        foreach ($files as $file) {
-            [$lang, $name] = $this->snippetIdentity($file);
-            if (isset($systemSnippets[$name])) {
-                continue;
-            }
-            $groups[$lang][] = [$file, $name];
+        if ($method === 'POST') {
+            $snippet = array_replace($snippet, [
+                'body' => (string) ($_POST['body'] ?? ''), 'name' => (string) ($_POST['name'] ?? ''),
+                'status' => (string) ($_POST['status'] ?? 'draft'), 'type' => (string) ($_POST['type'] ?? 'html'),
+                'extra_meta' => (string) ($_POST['extra_meta'] ?? ''),
+            ]);
         }
-
-        $systemScope = (string) ($_GET['system_scope'] ?? $_GET['lang'] ?? ($this->languages['default'] ?? 'ru'));
-        if ($systemScope !== 'all' && !in_array($systemScope, $this->orderedLanguages(), true)) {
-            $systemScope = (string) ($this->languages['default'] ?? 'ru');
+        $tab = (string) ($_GET['tab'] ?? 'editor');
+        $tabs = ['editor' => 'Редактор', 'mine' => 'Мои сниппеты', 'system' => 'Системные', 'upload' => 'Загрузка файла'];
+        if (!isset($tabs[$tab]) || $method === 'POST' || $editName !== '') {
+            $tab = 'editor';
         }
-
-        $lists = '';
-        foreach (array_merge($this->orderedLanguages(), ['all']) as $scope) {
-            $rows = '';
-
-            foreach ($groups[$scope] ?? [] as [$file, $name]) {
-                $relative = $this->relativePath($file);
-                $purpose = $systemSnippets[$name] ?? 'Именованный фрагмент для ручной вставки shortcode.';
-                $actions = [
-                    ['label' => 'Редактировать', 'url' => '/admin/content/snippets?lang=' . rawurlencode($scope) . '&name=' . rawurlencode($name)],
-                    ['label' => 'Скачать', 'url' => '/admin/content/snippets/download?file=' . rawurlencode($relative)],
-                ];
-                if (str_ends_with($relative, '.mur.md')) {
-                    $actions[] = ['label' => 'Загрузить взамен', 'url' => '#', 'attributes' => 'data-file-replace-open data-file-scope="snippets" data-file-path="' . mur_escape($relative) . '"'];
+        $scope = (string) ($_GET['system_scope'] ?? $editLang);
+        if ($scope !== 'all' && !in_array($scope, $this->orderedLanguages(), true)) {
+            $scope = (string) ($this->languages['default'] ?? 'ru');
+        }
+        $nav = '<nav class="admin-tabs" aria-label="Snippets">';
+        foreach ($tabs as $key => $label) {
+            $nav .= '<a href="/admin/content/snippets?tab=' . $key . '&amp;system_scope=' . rawurlencode($scope) . '"' . ($key === $tab ? ' class="is-active" aria-current="page"' : '') . '>' . $label . '</a>';
+        }
+        $nav .= '</nav>';
+        $systems = $this->systemSnippetDescriptions();
+        if ($tab === 'system') {
+            return $notice . $nav . '<section class="admin-panel">' . $this->systemSnippetRegistry($systems, $scope) . '</section>' . $this->fileReplaceDialog($user);
+        }
+        if ($tab === 'upload') {
+            return $notice . $nav . $this->fileUploadPanel('snippets', $user);
+        }
+        if ($tab === 'mine') {
+            $groups = [];
+            foreach ($this->snippetFiles() as $file) {
+                [$language, $name] = $this->snippetIdentity($file);
+                if (!isset($systems[$name])) {
+                    $groups[$language][] = [$file, $name];
                 }
-                $actions[] = ['label' => 'Удалить', 'url' => '/admin/content/snippets/delete?file=' . rawurlencode($relative), 'danger' => true];
-                $rows .= '<tr><td><code>' . mur_escape($name) . '</code></td><td>' . mur_escape($purpose) . '</td><td><code>' . mur_escape($relative) . '</code></td><td>' . $this->toolbar($actions) . '</td></tr>';
             }
-
-            if ($rows === '') {
-                $rows = '<tr><td colspan="4">Snippets этой области пока не созданы.</td></tr>';
+            $lists = '';
+            foreach (array_merge($this->orderedLanguages(), ['all']) as $language) {
+                $rows = '';
+                foreach ($groups[$language] ?? [] as [$file, $name]) {
+                    $rows .= '<tr><td><code>' . mur_escape($name) . '</code></td><td><code>' . mur_escape($this->relativePath($file)) . '</code></td><td>' . $this->snippetActions($file, $language, $name) . '</td></tr>';
+                }
+                $lists .= '<section class="admin-panel admin-language-group"><h2>' . mur_escape($this->languageHeading($language)) . '</h2><table class="admin-table"><thead><tr><th>Имя</th><th>Файл</th><th>Действия</th></tr></thead><tbody>' . ($rows !== '' ? $rows : '<tr><td colspan="3">Snippets этой области пока не созданы.</td></tr>') . '</tbody></table></section>';
             }
-
-            $lists .= '<div class="admin-language-group"><h3>' . mur_escape($this->languageHeading($scope)) . '</h3><table class="admin-table"><thead><tr><th>Имя</th><th>Назначение</th><th>Файл</th><th>Действия</th></tr></thead><tbody>' . $rows . '</tbody></table></div>';
+            return $notice . $nav . $lists . $this->fileReplaceDialog($user);
         }
-
         $editorTools = $this->hooks->render('admin.editor_tools', [
-            'editor' => 'snippet',
-            'textarea' => 'body',
-            'scope' => $snippet['lang'],
-            'name' => $snippet['name'],
-            'type' => $snippet['type'],
+            'editor' => 'snippet', 'textarea' => 'body', 'scope' => $snippet['lang'],
+            'name' => $snippet['name'], 'type' => $snippet['type'],
         ]);
-
-        return $notice . '<section class="admin-panel">
-  <h2>Ушки / snippets</h2>
-  <p>Именованные фрагменты HTML/PHP. Ручная вставка: <code>[snippet=name]</code> или <code>[ushka=name]</code>. Зарезервированные имена <code>system-*</code> автоматически подключаются в технических местах шаблона.</p>
-  <p>Поиск: текущий язык → global/all → основной язык сайта. Найденный черновик ничего не выводит и останавливает fallback.</p>
-  ' . $this->systemSnippetRegistry($systemSnippets, $systemScope) . '
-  ' . $lists . '
-  <p><strong>PHP включен:</strong> snippets типа <code>php</code> выполняются на сервере и доступны для редактирования только администраторам. Ошибка в PHP-коде может остановить вывод страницы.</p>
-</section>
-<section class="admin-panel">
-  <h2>' . ($snippet['name'] !== '' ? 'Редактировать' : 'Создать') . '</h2>
+        return $notice . $nav . '<section class="admin-panel"><h2>' . ($snippet['name'] !== '' ? 'Редактировать' : 'Создать') . '</h2>
   <form class="admin-form" method="post" action="/admin/content/snippets">
     <input type="hidden" name="_csrf" value="' . mur_escape((string) $user['csrf']) . '">
-    <div class="admin-form-grid">
-      <label>Область
-        <select name="lang">' . $this->snippetScopeOptions($snippet['lang']) . '</select>
-      </label>
-      <label>Имя
-        <input name="name" value="' . mur_escape($snippet['name']) . '" pattern="[A-Za-z0-9_-]+" list="system-snippet-names" required>
-        <datalist id="system-snippet-names">' . $this->systemSnippetDatalist($systemSnippets) . '</datalist>
-      </label>
-      <label>Статус
-        <select name="status">' . $this->statusOptions($snippet['status']) . '</select>
-      </label>
-      <label>Тип
-        <select name="type"><option value="html"' . ($snippet['type'] === 'html' ? ' selected' : '') . '>html</option><option value="php"' . ($snippet['type'] === 'php' ? ' selected' : '') . '>php</option></select>
-      </label>
-    </div>
+    <input type="hidden" name="original_name" value="' . mur_escape($snippet['name']) . '">
+    <label class="admin-field-full">Имя<input name="name" value="' . mur_escape($snippet['name']) . '" pattern="[A-Za-z0-9_-]+" list="system-snippet-names" required></label>
+    <datalist id="system-snippet-names">' . $this->systemSnippetDatalist($systems) . '</datalist>
     ' . $editorTools . '
-    <textarea name="body" rows="18" spellcheck="false">' . mur_escape($snippet['body']) . '</textarea>
-    <div class="admin-actions">
-      <button class="admin-button" type="submit">' . $this->icon('save') . '<span>Сохранить snippet</span></button>
-      <a class="admin-button admin-button--ghost" href="/admin/content/snippets">' . $this->icon('add') . '<span>Новый snippet</span></a>
-    </div>
+    <label class="admin-field-full">Содержимое<textarea name="body" rows="22" spellcheck="false">' . mur_escape($snippet['body']) . '</textarea></label>
+    <label>Область<select name="lang">' . $this->snippetScopeOptions($snippet['lang']) . '</select></label>
+    <label>Статус<select name="status">' . $this->statusOptions($snippet['status']) . '</select></label>
+    <label>Тип<select name="type">' . $this->selectOptions(['html' => 'html', 'php' => 'php'], $snippet['type']) . '</select></label>
+    <label class="admin-field-full">Дополнительные параметры<textarea name="extra_meta" rows="6" spellcheck="false">' . mur_escape($snippet['extra_meta']) . '</textarea><span class="admin-help">Front matter: ключ: значение, например parser: murtext или murtext.pretty: 1. Параметры сохраняются перед ---.</span></label>
+    <div class="admin-actions"><button class="admin-button" type="submit">' . $this->icon('save') . '<span>Сохранить snippet</span></button><a class="admin-button admin-button--ghost" href="/admin/content/snippets">' . $this->icon('add') . '<span>Новый snippet</span></a></div>
   </form>
-</section>' . $this->fileUploadPanel('snippets', $user) . $this->fileReplaceDialog($user);
+  <p class="admin-help">Вставка: [snippet=name] или [ushka=name]. Поиск: текущий язык → Global → основной язык. Черновик останавливает fallback. PHP требует разрешения snippets.allow_php.</p>
+</section>';
+    }
+
+    private function snippetActions(string $file, string $scope, string $name): string
+    {
+        $relative = $this->relativePath($file);
+        return $this->toolbar([
+            ['label' => 'Редактировать', 'url' => '/admin/content/snippets?tab=editor&lang=' . rawurlencode($scope) . '&name=' . rawurlencode($name)],
+            ['label' => 'Скачать', 'url' => '/admin/content/snippets/download?file=' . rawurlencode($relative)],
+            ['label' => 'Загрузить взамен', 'url' => '#', 'attributes' => 'data-file-replace-open data-file-scope="snippets" data-file-path="' . mur_escape($relative) . '"'],
+            ['label' => 'Удалить', 'url' => '/admin/content/snippets/delete?file=' . rawurlencode($relative), 'danger' => true],
+        ]);
     }
 
     private function saveSnippet(array $user): string
@@ -2578,8 +2664,15 @@ final class AdminRouter
             return $this->notice('Неверная область snippet.', true);
         }
 
-        $content = "id: " . $name . "\nstatus: " . $status . "\ntype: " . $type . "\n---\n\n" . rtrim($body) . "\n";
-        $this->writeTextFile($file, $content);
+        $existing = is_file($file) ? $this->parser->parse($file, 'snippet', $scope)->meta : [];
+        $meta = array_key_exists('extra_meta', $_POST)
+            ? $this->parser->parseHeader((string) $_POST['extra_meta']) : $existing;
+        $meta = array_replace($meta, ['id' => $name, 'status' => $status, 'type' => $type]);
+        if (is_file($file)) {
+            $this->backupManagedFile($file);
+        }
+        $this->writeDocument($file, $meta, $body);
+        $this->redirect('/admin/content/snippets?tab=editor&lang=' . rawurlencode($scope) . '&name=' . rawurlencode($name) . '&saved=1', 303);
 
         return $this->notice('Snippet сохранен: ' . $this->relativePath($file));
     }
@@ -2593,6 +2686,7 @@ final class AdminRouter
             'status' => 'published',
             'type' => 'html',
             'body' => '',
+            'extra_meta' => '',
         ];
 
         if (!preg_match('/^[A-Za-z0-9_-]+$/', $name)) {
@@ -2610,10 +2704,11 @@ final class AdminRouter
 
         return [
             'lang' => $scope,
-            'name' => $document->id(),
+            'name' => $name,
             'status' => $document->status(),
             'type' => strtolower((string) ($document->meta['type'] ?? 'html')),
             'body' => $document->body,
+            'extra_meta' => $this->snippetExtraMeta($document->meta),
         ];
     }
 
@@ -2658,33 +2753,35 @@ final class AdminRouter
 
     private function systemSnippetRegistry(array $snippets, string $scope): string
     {
+        $links = '<nav class="admin-scope-links" aria-label="Область системных snippets">';
+        foreach (array_merge($this->orderedLanguages(), ['all']) as $language) {
+            $links .= '<a href="/admin/content/snippets?tab=system&amp;system_scope=' . rawurlencode($language) . '"' . ($language === $scope ? ' class="is-active" aria-current="page"' : '') . '>' . ($language === 'all' ? 'Global' : mur_escape(strtoupper($language))) . '</a>';
+        }
         $rows = '';
         foreach ($snippets as $name => $description) {
-            $exactFile = $this->systemSnippetFile($scope, (string) $name);
-            $exists = is_file($exactFile);
-            $state = $exists ? $this->systemSnippetFileState($exactFile, $scope) : 'Не создан';
-            $actionLabel = $exists ? 'Редактировать' : 'Создать';
-
-            if (!$exists) {
-                $fallback = $this->systemSnippetFallback($scope, (string) $name);
-                if ($fallback !== null) {
-                    $fallbackState = $this->systemSnippetFileState($fallback['file'], $fallback['scope']);
-                    $state = str_contains($fallbackState, 'Черновик')
-                        ? 'Fallback ' . $fallback['label'] . ': черновик останавливает вывод'
-                        : 'Используется fallback: ' . $fallback['label'];
-                    $actionLabel = 'Создать переопределение';
-                }
+            $file = $this->systemSnippetFile($scope, (string) $name);
+            $exists = is_file($file);
+            $state = $exists ? $this->systemSnippetFileState($file, $scope) : 'Локальный файл не создан';
+            $fallback = $exists ? null : $this->systemSnippetFallback($scope, (string) $name);
+            if ($fallback !== null) {
+                $state .= ' · Fallback ' . $fallback['label'] . ': ' . $this->systemSnippetFileState($fallback['file'], $fallback['scope']);
             }
-
-            $url = '/admin/content/snippets?system_scope=' . rawurlencode($scope)
-                . '&lang=' . rawurlencode($scope) . '&name=' . rawurlencode((string) $name);
-            $rows .= '<tr data-system-snippet="' . mur_escape((string) $name) . '"><td><code>' . mur_escape((string) $name) . '</code></td><td>' . mur_escape((string) $description)
-                . '</td><td>' . mur_escape($state) . '</td><td>' . $this->toolbar([['label' => $actionLabel, 'url' => $url]]) . '</td></tr>';
+            $actions = $exists ? $this->snippetActions($file, $scope, (string) $name)
+                : $this->toolbar([['label' => $fallback !== null ? 'Создать переопределение' : 'Создать', 'url' => '/admin/content/snippets?tab=editor&lang=' . rawurlencode($scope) . '&name=' . rawurlencode((string) $name)]]);
+            $rows .= '<tr data-system-snippet="' . mur_escape((string) $name) . '"><td><code>' . mur_escape((string) $name) . '</code></td><td>' . mur_escape((string) $description) . '</td><td>' . mur_escape($state) . '</td><td>' . $actions . '</td></tr>';
         }
+        return '<section class="admin-system-snippets"><h2>Системные позиции</h2>' . $links . '</nav><p class="admin-help">Создание сохраняет файл только после Save. Удаление локального файла оставляет системную позицию и восстанавливает fallback.</p><table class="admin-table"><thead><tr><th>Имя</th><th>Место вывода</th><th>Состояние</th><th>Действия</th></tr></thead><tbody>' . $rows . '</tbody></table></section>';
+    }
 
-        return '<section class="admin-system-snippets"><div class="admin-panel-head"><div><h3>Системные позиции</h3><p>Файл создаётся только после сохранения формы редактора.</p></div>'
-            . '<form method="get" action="/admin/content/snippets"><label>Область <select name="system_scope">' . $this->snippetScopeOptions($scope) . '</select></label><button class="admin-button admin-button--ghost" type="submit">Показать</button></form></div>'
-            . '<table class="admin-table"><thead><tr><th>Имя</th><th>Место вывода</th><th>Состояние</th><th>Действие</th></tr></thead><tbody>' . $rows . '</tbody></table></section>';
+    private function snippetExtraMeta(array $meta): string
+    {
+        $lines = [];
+        foreach (array_diff_key($meta, array_flip(['id', 'status', 'type'])) as $key => $value) {
+            if (is_scalar($value)) {
+                $lines[] = $key . ': ' . (string) $value;
+            }
+        }
+        return implode("\n", $lines);
     }
 
     private function systemSnippetFile(string $scope, string $name): string
@@ -3267,22 +3364,13 @@ final class AdminRouter
     {
         $notice = $method === 'POST' ? $this->savePluginsConfig($user) : '';
         $enabled = $this->enabledPlugins();
-        $available = $this->availablePlugins();
         $rows = '';
-
-        foreach ($available as $plugin) {
+        foreach ($this->availablePlugins() as $plugin) {
             $checked = in_array($plugin, $enabled, true);
-            $rows .= '<tr><td><code>' . mur_escape($plugin) . '</code></td><td>' . ($checked ? 'enabled' : 'disabled') . '</td><td><label class="admin-check"><input type="checkbox" name="plugins[]" value="' . mur_escape($plugin) . '"' . ($checked ? ' checked' : '') . '><span>Включить</span></label></td></tr>';
+            $info = $this->plugins->metadata($plugin);
+            $rows .= '<tr><td><strong>' . mur_escape($info['name'] ?? $plugin) . '</strong><small class="admin-help">' . mur_escape($info['description'] ?? '') . '</small></td><td><code>' . mur_escape($plugin) . '</code></td><td>' . mur_escape($info['version'] ?? '') . '</td><td>' . $this->statusIcon($checked ? 'published' : 'draft', $checked ? 'Включён' : 'Отключён') . '</td><td><label class="admin-check"><input type="checkbox" name="plugins[]" value="' . mur_escape($plugin) . '"' . ($checked ? ' checked' : '') . '><span>Включить</span></label></td></tr>';
         }
-
-        return $notice . '<section class="admin-panel">
-  <h2>Плагины</h2>
-  <form class="admin-form" method="post" action="/admin/plugins">
-    <input type="hidden" name="_csrf" value="' . mur_escape((string) $user['csrf']) . '">
-    <table class="admin-table"><thead><tr><th>Плагин</th><th>Состояние</th><th>Управление</th></tr></thead><tbody>' . $rows . '</tbody></table>
-    <button class="admin-button" type="submit">Сохранить список плагинов</button>
-  </form>
-</section>';
+        return $notice . '<section class="admin-panel"><h2>Управление плагинами</h2><form class="admin-form" method="post" action="/admin/plugins"><input type="hidden" name="_csrf" value="' . mur_escape((string) $user['csrf']) . '"><table class="admin-table"><thead><tr><th>Плагин</th><th>ID</th><th>Версия</th><th>Состояние</th><th>Управление</th></tr></thead><tbody>' . $rows . '</tbody></table><button class="admin-button" type="submit">Сохранить список плагинов</button></form></section>';
     }
 
     private function saveLanguageSettings(array $user): string
@@ -3321,6 +3409,7 @@ final class AdminRouter
         $this->languages['structure'] = $structure;
         $this->languages['labels'] = $labels;
         $this->writeConfigFile('config/languages.php', $this->languages);
+        $this->saveFavicon('frontend');
 
         return $this->notice($this->t('Настройки языков сохранены.'));
     }
@@ -3687,6 +3776,7 @@ final class AdminRouter
         unset($adminUser);
 
         $this->persistAdminConfig();
+        $this->saveFavicon('admin');
         $this->auth->updateSessionUser(['admin_language' => $userLanguage]);
         $this->i18n->setLanguage($userLanguage);
 
@@ -4089,7 +4179,19 @@ final class AdminRouter
             try {
                 $file = mur_path($relative);
                 $this->backupManagedFile($file);
-                $this->writeTextFile($file, str_replace(["\r\n", "\r"], "\n", (string) ($_POST['content'] ?? '')));
+                $body = str_replace(["\r\n", "\r"], "\n", (string) ($_POST['content'] ?? ''));
+                if (in_array($collection['id'], ['home', 'footer'], true) && array_key_exists('extra_meta', $_POST)) {
+                    $meta = $this->parser->parseHeader((string) $_POST['extra_meta']);
+                    $title = trim((string) ($_POST['title'] ?? ''));
+                    if ($title !== '') {
+                        $meta['title'] = $title;
+                    } else {
+                        unset($meta['title']);
+                    }
+                    $this->writeDocument($file, $meta, $body);
+                } else {
+                    $this->writeTextFile($file, $body);
+                }
                 $notice = $this->notice('Файл сохранен.');
             } catch (\Throwable $exception) {
                 $notice = $this->notice($exception->getMessage(), true);
@@ -4098,6 +4200,22 @@ final class AdminRouter
 
         $file = mur_path($relative);
         $content = (string) file_get_contents($file);
+        $contentBlock = in_array($collection['id'], ['home', 'footer'], true);
+        $titleField = '';
+        $metaField = '';
+        if ($contentBlock) {
+            $document = $this->parser->parse($file, (string) $collection['id'], $this->languageFromRelativePath($relative));
+            $meta = $document->meta;
+            $title = (string) ($meta['title'] ?? '');
+            unset($meta['title']);
+            $content = $document->body;
+            $lines = [];
+            foreach ($meta as $key => $value) {
+                $lines[] = $key . ': ' . $value;
+            }
+            $titleField = '<label class="admin-field-full">Заголовок<input name="title" value="' . mur_escape($title) . '"></label>';
+            $metaField = '<label class="admin-field-full">Дополнительные параметры<textarea name="extra_meta" rows="6" spellcheck="false">' . mur_escape(implode("\n", $lines)) . '</textarea><span class="admin-help">Front matter: ключ: значение. Параметры сохраняются перед ---; содержимое — после.</span></label>';
+        }
         $hint = trim((string) ($collection['hint'] ?? ''));
         $editorTools = $this->hooks->render('admin.editor_tools', [
             'editor' => 'file', 'textarea' => 'content', 'scope' => (string) $collection['id'], 'file' => $relative,
@@ -4106,8 +4224,8 @@ final class AdminRouter
         return $notice . '<section class="admin-panel"><h2>Файловый редактор</h2><p><code>' . mur_escape($relative) . '</code></p>'
             . '<form class="admin-form" method="post" action="/admin/files/edit?scope=' . rawurlencode((string) $collection['id']) . '&amp;file=' . rawurlencode($relative) . '">'
             . '<input type="hidden" name="_csrf" value="' . mur_escape((string) $user['csrf']) . '"><input type="hidden" name="scope" value="' . mur_escape((string) $collection['id']) . '"><input type="hidden" name="file" value="' . mur_escape($relative) . '">'
-            . $editorTools . ($hint !== '' ? '<p class="admin-help">' . $hint . '</p>' : '')
-            . '<textarea name="content" rows="28" spellcheck="false">' . mur_escape($content) . '</textarea><div class="admin-actions"><button class="admin-button" type="submit">Сохранить</button><a class="admin-button admin-button--ghost" href="' . mur_escape((string) $collection['route']) . '">Назад</a></div></form></section>';
+            . $titleField . $editorTools . ($hint !== '' ? '<p class="admin-help">' . $hint . '</p>' : '')
+            . '<textarea name="content" aria-label="Содержимое" rows="28" spellcheck="false">' . mur_escape($content) . '</textarea>' . $metaField . '<div class="admin-actions"><button class="admin-button" type="submit">Сохранить</button><a class="admin-button admin-button--ghost" href="' . mur_escape((string) $collection['route']) . '">Назад</a></div></form></section>';
     }
 
     private function managedFileDelete(array $collection, string $method, array $user): string
@@ -4298,7 +4416,13 @@ final class AdminRouter
             ? '<label>' . mur_escape($this->t('Тип файла')) . '<select name="target">' . $this->selectOptions($targets, (string) array_key_first($targets)) . '</select></label>'
             : '<input type="hidden" name="target" value="' . mur_escape((string) array_key_first($targets)) . '">';
 
-        return '<section class="admin-panel admin-file-upload"><h2>' . mur_escape($this->t('Загрузка файла')) . '</h2><p class="admin-help">' . mur_escape($this->t('Загружайте только заранее подготовленные файлы MurCMS .mur.md. Содержимое документа не проверяется на ошибки, конфликты ID, URL, slug, translation key и другие логические проблемы.')) . ' ' . mur_escape($this->t('Максимальный размер файла: 2 MB.')) . '</p><form class="admin-form" method="post" action="/admin/files/upload" enctype="multipart/form-data" data-mur-file-upload><input type="hidden" name="_csrf" value="' . mur_escape((string) $user['csrf']) . '"><input type="hidden" name="scope" value="' . mur_escape($scope) . '"><div class="admin-form-grid"><label>' . mur_escape($this->t('Целевой язык / scope')) . '<select name="language">' . $this->selectOptions($languages, $selectedLanguage) . '</select></label>' . $targetField . '</div><label class="admin-file-drop" data-file-drop>' . mur_escape($this->t('Перетащите один файл .mur.md сюда или выберите его')) . '<input type="file" name="mur_file" accept=".mur.md" required></label><button class="admin-button" type="submit">' . mur_escape($this->t('Загрузить')) . '</button><div class="admin-file-result" data-file-result role="status" aria-live="polite"></div></form></section>';
+        $languageRadios = '<fieldset class="admin-radio-group"><legend>' . mur_escape($this->t('Целевой язык / scope')) . '</legend>';
+        foreach ($languages as $language => $label) {
+            $languageRadios .= '<label class="admin-check"><input type="radio" name="language" value="' . mur_escape($language) . '"' . ($language === $selectedLanguage ? ' checked' : '') . ' required><span>' . ($language === 'all' ? 'Global' : mur_escape($label)) . '</span></label>';
+        }
+        $languageRadios .= '</fieldset>';
+
+        return '<section class="admin-panel admin-file-upload"><h2>' . mur_escape($this->t('Загрузка файла')) . '</h2><p class="admin-help">' . mur_escape($this->t('Загружайте только заранее подготовленные файлы MurCMS .mur.md. Содержимое документа не проверяется на ошибки, конфликты ID, URL, slug, translation key и другие логические проблемы.')) . ' ' . mur_escape($this->t('Максимальный размер файла: 2 MB.')) . '</p><form class="admin-form" method="post" action="/admin/files/upload" enctype="multipart/form-data" data-mur-file-upload><input type="hidden" name="_csrf" value="' . mur_escape((string) $user['csrf']) . '"><input type="hidden" name="scope" value="' . mur_escape($scope) . '"><div class="admin-form-grid">' . $languageRadios . $targetField . '</div><label class="admin-file-drop" data-file-drop>' . mur_escape($this->t('Перетащите один файл .mur.md сюда или выберите его')) . '<input type="file" name="mur_file" accept=".mur.md" required></label><button class="admin-button" type="submit">' . mur_escape($this->t('Загрузить')) . '</button><div class="admin-file-result" data-file-result role="status" aria-live="polite"></div></form></section>';
     }
 
     private function fileReplaceDialog(array $user): string
@@ -4313,7 +4437,7 @@ final class AdminRouter
             'seo.title', 'seo.description', 'summary', 'page.header',
             'list.source', 'list.view', 'list.sort', 'list.direction', 'list.per_page', 'list.position',
         ];
-        $reservedKeys = array_flip([...$keys, 'categories']);
+        $reservedKeys = array_flip([...$keys, 'categories', 'updated_at']);
         $meta = [];
 
         foreach ($keys as $key) {
@@ -4344,15 +4468,9 @@ final class AdminRouter
             $meta['template'] = 'category';
         }
 
-        foreach (preg_split('/\R/u', (string) ($_POST['extra_meta'] ?? '')) ?: [] as $line) {
-            $line = trim($line);
-            if ($line === '' || !str_contains($line, ':')) {
-                continue;
-            }
-            [$key, $value] = explode(':', $line, 2);
-            $key = trim($key);
-            if ($key !== '' && !isset($reservedKeys[$key]) && !array_key_exists($key, $meta)) {
-                $meta[$key] = trim($value);
+        foreach ($this->parser->parseHeader((string) ($_POST['extra_meta'] ?? '')) as $key => $value) {
+            if (!isset($reservedKeys[$key]) && !array_key_exists($key, $meta)) {
+                $meta[$key] = $value;
             }
         }
 
@@ -4375,13 +4493,7 @@ final class AdminRouter
 
     private function writeDocument(string $file, array $meta, string $body): void
     {
-        $header = '';
-        foreach ($meta as $key => $value) {
-            if (is_scalar($value) && trim((string) $value) !== '') {
-                $header .= $key . ': ' . trim((string) $value) . "\n";
-            }
-        }
-        $this->writeTextFile($file, rtrim($header) . "\n---\n\n" . rtrim($body) . "\n");
+        $this->writeTextFile($file, $this->parser->serialize($meta, $body));
     }
 
     private function documentCollisionError(
@@ -4521,7 +4633,7 @@ final class AdminRouter
     {
         $knownKeys = [
             'id', 'title', 'slug', 'status', 'parent', 'template', 'translation_key', 'order',
-            'seo.title', 'seo.description', 'summary', 'page.header', 'categories',
+            'seo.title', 'seo.description', 'summary', 'page.header', 'categories', 'updated_at',
             'list.source', 'list.view', 'list.sort', 'list.direction', 'list.per_page', 'list.position',
         ];
         $knownKeys = $this->hooks->filter('admin.known_meta_keys', $knownKeys);
@@ -4649,15 +4761,15 @@ final class AdminRouter
         return '<svg class="admin-icon" aria-hidden="true" focusable="false"><use href="#admin-icon-' . mur_escape($name) . '"></use></svg>';
     }
 
-    private function statusIcon(string $status): string
+    private function statusIcon(string $status, ?string $label = null): string
     {
         $published = strtolower(trim($status)) === 'published';
-        $label = $published ? 'Опубликован' : 'Черновик';
+        $label ??= $published ? 'Опубликован' : 'Черновик';
         $class = $published ? 'published' : 'draft';
 
-        return '<span class="admin-status admin-status--' . $class . '" aria-label="' . $label . '" title="' . $label . '">'
+        return '<span class="admin-status admin-status--' . $class . '" aria-label="' . mur_escape($label) . '" title="' . mur_escape($label) . '">'
             . $this->icon($class)
-            . '<span class="visually-hidden">' . $label . '</span></span>';
+            . '<span class="visually-hidden">' . mur_escape($label) . '</span></span>';
     }
 
     private function editorIntro(bool $isPage, bool $help): string
@@ -5283,10 +5395,10 @@ final class AdminRouter
         return $plugins;
     }
 
-    private function redirect(string $url): void
+    private function redirect(string $url, int $status = 302): void
     {
         http_response_code(302);
-        header('Location: ' . $url);
+        header('Location: ' . $url, true, $status);
     }
 
     private function securityHeaders(): void

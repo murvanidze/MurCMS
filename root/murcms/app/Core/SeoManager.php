@@ -29,6 +29,30 @@ final class SeoManager
         return is_array($this->config['sitemap'] ?? null) ? $this->config['sitemap'] : [];
     }
 
+    public static function homeMeta(array $config, array $site, array $languages, string $language): array
+    {
+        $home = is_array($config['home'] ?? null) ? $config['home'] : [];
+        $result = [];
+        foreach (['title' => 'name', 'description' => 'description'] as $key => $legacy) {
+            $value = '';
+            foreach (array_unique([$language, (string) ($languages['default'] ?? '')]) as $scope) {
+                $candidate = $home[$scope][$key] ?? '';
+                if (is_string($candidate) && trim($candidate) !== '') {
+                    $value = trim($candidate);
+                    break;
+                }
+            }
+            $result[$key] = $value !== '' ? $value : (string) ($site[$legacy] ?? '');
+        }
+        return $result;
+    }
+
+    public function saveHomeMeta(array $home): void
+    {
+        $this->config['home'] = array_replace((array) ($this->config['home'] ?? []), $home);
+        $this->writeConfig();
+    }
+
     public function robotsContent(): string
     {
         $robots = is_array($this->config['robots'] ?? null) ? $this->config['robots'] : [];
@@ -260,6 +284,9 @@ HTACCESS;
             @unlink($tmp);
             throw new \RuntimeException('Unable to replace file: ' . $file);
         }
+        if (function_exists('opcache_invalidate')) {
+            @opcache_invalidate($file, true);
+        }
     }
 
     private function absoluteUrl(string $path): string
@@ -277,10 +304,13 @@ HTACCESS;
 
     private function documentLastmod(Document $document): string
     {
-        $value = trim((string) ($document->meta['updated_at'] ?? $document->meta['date'] ?? ''));
-
-        if ($value !== '') {
-            return substr($value, 0, 10);
+        $timezone = (string) ($this->site['timezone'] ?? 'UTC');
+        foreach (['updated_at', 'date'] as $key) {
+            $value = trim((string) ($document->meta[$key] ?? ''));
+            $date = DocumentDates::parse($value, $timezone);
+            if ($date !== null) {
+                return strlen($value) === 10 ? $date->format('Y-m-d') : $date->format(DATE_ATOM);
+            }
         }
 
         $mtime = is_file($document->filePath) ? filemtime($document->filePath) : false;

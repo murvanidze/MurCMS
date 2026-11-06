@@ -1,7 +1,7 @@
 # Plugin API MurCMS
 
 **Статус:** канонический developer reference  
-**Применимо к MurCMS:** `0.4.1`  
+**Применимо к MurCMS:** `0.4.2`
 **Source of truth версии CMS:** `murcms/app/version.php` → `MUR_CMS_VERSION`
 
 Этот документ описывает фактический публичный контракт Plugin API текущей MurCMS. Он предназначен для разработчиков штатных и сторонних плагинов и для coding agents.
@@ -340,6 +340,57 @@ $context->hooks->add('content.render_body', static function (mixed $html, array 
 });
 ```
 
+### Snippets service hooks
+
+Bundled plugin `snippets` публикует два service hook для других plugins. Они
+доступны только когда `snippets` включён; consumer обязан проверить
+`Hooks::has()` и безопасно деградировать, если provider отсутствует.
+
+#### `snippets.render`
+
+**Назначение:** отрендерить один snippet через штатный Snippets pipeline без
+повторного filesystem lookup в consumer plugin.
+
+**Initial value:** `''`.
+
+**Context:** `id` — snippet ID, `language` — двухбуквенный код языка. Недопустимое значение языка безопасно заменяется основным языком.
+
+**Возврат:** готовый HTML (`string`) либо пустая строка.
+
+Допустимый `id` соответствует `^[A-Za-z0-9][A-Za-z0-9_-]*$`. Provider сохраняет
+обычный порядок поиска language → global → default language, правило draft,
+`allow_php` и обработку body через `mur_render_body()`, включая MurText. Пустой
+результат означает отсутствующий, draft, запрещённый или неотрендерированный
+snippet; consumer не должен обходить этот результат прямым чтением файла.
+
+```php
+$html = $context->hooks->filter('snippets.render', '', [
+    'id' => 'cta',
+    'language' => 'ru',
+]);
+```
+
+#### `snippets.registry`
+
+**Назначение:** получить безопасный inventory существующих snippet IDs для
+admin picker и диагностики.
+
+**Initial value:** `[]`.
+
+**Context:** пустой массив.
+
+**Возврат:** список records `id`, `scopes`, `formats`.
+
+`scopes` содержит `global` и/или двухбуквенные language directories;
+`formats` — `mur.md` и/или `html`. Registry сообщает наличие файлов, но не
+обещает, что конкретный ID будет отрендерирован для выбранного языка: status,
+fallback, PHP policy и body renderer проверяются только через
+`snippets.render`.
+
+```php
+$registry = $context->hooks->filter('snippets.registry', [], []);
+```
+
 ---
 
 ## 8. Listing hook
@@ -619,7 +670,7 @@ Current core сохраняет этот путь совместимости: е
 - всегда задавать `role` явно;
 - не полагаться на fallback `editor`.
 
-В текущем коде MurCMS 0.4.1 не задана дата удаления legacy filter и не объявлен автоматический переход на более строгий fallback. Поэтому документация не устанавливает несуществующий deprecation schedule.
+В текущем коде MurCMS 0.4.2 не задана дата удаления legacy filter и не объявлен автоматический переход на более строгий fallback. Поэтому документация не устанавливает несуществующий deprecation schedule.
 
 Все bundled plugin admin routes должны иметь explicit `role`.
 
@@ -1080,3 +1131,7 @@ Bundled implementation не является автоматически норм
 | Версия/release MurCMS | `murcms/app/version.php` и соответствующий release document |
 
 Другие документы могут перечислять hook names или давать краткий контекст использования, но не должны повторять сигнатуры, route fields, authorization contract, fallback behavior, asset/config contract и полный перечень extension points.
+
+## Plugin inventory metadata (0.4.2)
+
+Неисполняемый info.json в каталоге плагина описывает name, version и факультативные description, author, website, license. Все отображаемые значения — строки и HTML-экранируются. Файл ограничен 64 KB, некорректный JSON даёт пустые metadata; ID всегда определяется каталогом. Не подключайте отключённый plugin.php для получения версии. Пункт управления плагинами существует в начале группы Plugins даже при пустом enabled.

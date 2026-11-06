@@ -11,7 +11,7 @@ return [
         'enabled' => true,
         'include_home' => true,
         'include_documents' => true,
-        'include_lastmod' => false,
+        'include_lastmod' => true,
     ],
     'robots' => [
         'content' => "User-agent: *\nDisallow: /admin/\nDisallow: /data/\nDisallow: /murcms/app/\nDisallow: /murcms/admin/\nDisallow: /murcms/plugins/\n\nSitemap: {SITEMAP_URL}\n",

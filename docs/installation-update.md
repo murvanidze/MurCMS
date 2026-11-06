@@ -1,7 +1,7 @@
 # MurCMS installation and update
 
 Дата: 2026-09-07  
-Статус: каноническая инструкция для MurCMS `0.4.1`
+Статус: каноническая инструкция для MurCMS `0.4.2`
 
 Этот документ владеет требованиями к окружению, моделью `*.dist.php`/runtime-конфигов,
 writable paths и update-safe процедурой. Короткий сценарий первого запуска находится в
@@ -113,7 +113,7 @@ root/.htaccess
 6. выполните migration notes конкретных плагинов, если они есть;
 7. повторите server/security/browser checks.
 
-MurText `0.2.3` использует update-safe `data/config/murtext.php`; legacy
+MurText `0.2.4` использует update-safe `data/config/murtext.php`; legacy
 `murcms/plugins/murtext/config.php` допускается только как источник миграции старой установки.
 Admin assets MurText поставляются только через `murcms/assets/plugins/murtext/`; plugin-local каталог
 `murcms/plugins/murtext/assets/` в актуальном root-only package отсутствует.
@@ -154,3 +154,7 @@ root/uploads/murcms-custom/{template}/custom.css
 Если полный repository содержит project-specific lint/smoke scripts, запускайте их дополнительно.
 Этот documentation/root package сам по себе не гарантирует наличие `scripts/test.ps1`,
 `tests/smoke.php` или build scripts, поэтому их отсутствие нельзя трактовать как ошибку установки.
+
+## Updating to 0.4.2
+
+Use MurCMS-0.4.2-update.zip for an existing site and MurCMS-0.4.2-root.zip only for a new installation. Overlay the contents of root/ into the document root. Preserve all runtime data/config, content, uploads/custom CSS, data/templates/*/functions.php and .htaccess. New seo.dist.php enables sitemap lastmod only for new sites; keep the existing seo.php choice and enable it explicitly in SEO → Sitemap if desired. Home SEO adds an optional home[language][title|description] map to seo.php. No bulk content migration is required. Updated_at is created on first editor save if missing. Banerina is installed separately; existing installations keep their working plugins.php and Banerina runtime data. To enable the newly bundled BerryMur on an existing site, use plugin management.

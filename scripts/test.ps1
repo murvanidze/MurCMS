@@ -33,6 +33,8 @@ if (Get-Command node -ErrorAction SilentlyContinue) {
     if ($LASTEXITCODE -ne 0) {
         throw 'MurConsent JavaScript regression test failed.'
     }
+    & node (Join-Path $ProjectRoot 'tests/admin-042.test.js')
+    if ($LASTEXITCODE -ne 0) { throw 'Admin dates / BerryMur regression test failed.' }
 } else {
     Write-Warning 'Node.js was not found; JavaScript syntax checks were skipped.'
 }
@@ -51,5 +53,8 @@ if ($LASTEXITCODE -ne 0) {
 if ($LASTEXITCODE -ne 0) {
     throw 'MurConsent PHP regression test failed.'
 }
+
+& php (Join-Path $ProjectRoot 'tests/release-042.php')
+if ($LASTEXITCODE -ne 0) { throw 'Release 0.4.2 regression test failed.' }
 
 Write-Host "Syntax and smoke checks passed for $($phpFiles.Count) PHP files."

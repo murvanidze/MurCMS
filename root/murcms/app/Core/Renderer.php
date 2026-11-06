@@ -20,6 +20,7 @@ final class Renderer
         private readonly Hooks $hooks,
         private readonly FrontendTemplate $template,
         private readonly array $theme = [],
+        private readonly array $seoConfig = [],
     ) {
     }
 
@@ -43,10 +44,7 @@ final class Renderer
 
         $body = $this->hooks->filter('content.home', $body, ['language' => $language]);
 
-        return $this->template->renderLayout($language, null, $body, [
-            'title' => $this->site['name'],
-            'description' => $this->site['description'] ?? '',
-        ]);
+        return $this->template->renderLayout($language, null, $body, SeoManager::homeMeta($this->seoConfig, $this->site, $this->languages, $language));
     }
 
     private function configuredBlockIds(string $kind, string $language): ?array

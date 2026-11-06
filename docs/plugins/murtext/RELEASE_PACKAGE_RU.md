@@ -1,10 +1,10 @@
-# MurText 0.2.3: состав поставок
+# MurText 0.2.4: состав поставок
 
-MurText 0.2.3 — текущая версия интеграционного слоя MurText в MurCMS 0.4.1.
+MurText 0.2.4 — текущая версия интеграционного слоя MurText в MurCMS 0.4.2.
 
 Версии:
 
-- Plugin: `0.2.3`;
+- Plugin: `0.2.4`;
 - Parser core: `0.2.0`;
 - Dialect: `murtext-1`.
 
@@ -27,9 +27,9 @@ root/data/config/murtext.php
 Legacy-файл `root/murcms/plugins/murtext/config.php` не входит в новую поставку и поддерживается
 только как источник автоматической миграции старой установки.
 
-## Текущее состояние packaging в MurCMS 0.4.1
+## Текущее состояние packaging в MurCMS 0.4.2
 
-MurText 0.2.3 использует одну каноническую пару admin assets:
+MurText 0.2.4 использует одну каноническую пару admin assets:
 
 ```text
 root/murcms/assets/plugins/murtext/admin.css
@@ -54,6 +54,13 @@ docs/plugins/murtext/
 ```
 
 Runtime-плагин от этих файлов не зависит.
+
+Пакет MurText-0.2.4-update.zip дополнительно доставляет read-only копию
+канонического CORE_README_RU.md в root/murcms/plugins/murtext/help/. Она
+сверяется по хешу с docs/plugins/murtext/CORE_README_RU.md и открывается через
+/admin/plugin/murtext/help только роли admin и выше. Поэтому полная справка
+работает даже без распаковки отдельного docs.zip. Прямая HTTP-раздача plugin/help
+не разрешается. Краткая справка helpContent() общая для страницы и dialog.
 
 ## Source/dev package
 

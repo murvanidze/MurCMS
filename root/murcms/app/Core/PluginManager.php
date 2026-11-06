@@ -31,6 +31,26 @@ final class PluginManager
         return $this->loaded;
     }
 
+    public function metadata(string $name): array
+    {
+        if (!preg_match('/^[a-z0-9][a-z0-9_-]*$/D', $name)) {
+            return [];
+        }
+        $file = $this->pluginsPath . '/' . $name . '/info.json';
+        if (!is_file($file) || is_link($file) || filesize($file) > 65536) {
+            return [];
+        }
+        try {
+            $info = json_decode((string) @file_get_contents($file), true, 32, JSON_THROW_ON_ERROR);
+            if (!is_array($info)) {
+                return [];
+            }
+            return array_filter(array_intersect_key($info, array_flip(['name', 'version', 'description', 'author', 'website', 'license'])), 'is_string');
+        } catch (\Throwable) {
+            return [];
+        }
+    }
+
     private function load(string $name): void
     {
         if (!preg_match('/^[a-z0-9][a-z0-9_-]*$/', $name)) {

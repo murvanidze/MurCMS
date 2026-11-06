@@ -10,13 +10,13 @@ $RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
 
 $CmsVersion = Get-MurCmsVersion -RepoRoot $RepoRoot
 if ([string]::IsNullOrWhiteSpace($PackName)) {
-    $PackName = "murcms-$CmsVersion-root"
+    $PackName = "MurCMS-$CmsVersion-root"
 }
 
 $Paths = Get-PackPaths -RepoRoot $RepoRoot -PackName $PackName
 Reset-PackDirectory -Paths $Paths
 
-$files = @(Get-RepositoryFiles -RepoRoot $RepoRoot -Scope 'root')
+$files = @(Get-RepositoryFiles -RepoRoot $RepoRoot -Scope 'root' | Where-Object { Test-StandardPackageFile $_ })
 if ($files.Count -eq 0) {
     throw 'No root files found for packaging.'
 }

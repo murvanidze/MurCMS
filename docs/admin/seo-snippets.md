@@ -1,7 +1,7 @@
 # MurCMS admin: SEO and snippets
 
 Date: 2026-09-07
-Status: current MurCMS 0.4.1 behavior
+Status: current MurCMS 0.4.2 behavior
 
 ## SEO section
 
@@ -198,3 +198,21 @@ Current editor can:
 - save the `.mur.md` file safely inside allowed snippet paths.
 
 `type: php` is executed only when the site runtime config `root/data/config/snippets.php` explicitly sets `allow_php => true`. The distributable `snippets.dist.php` keeps `allow_php => false`, so PHP snippets are disabled by default. Snippet editing is admin-only, but enabling PHP remains high-risk: a syntax or runtime error can stop public page rendering.
+
+## 0.4.2 workflows
+
+The Snippets screen has Editor, My snippets, System, and Upload tabs in this order.
+Editor starts with Name and Body; additional metadata accepts the same key: value
+front matter as pages and is written before ---. Unknown valid keys survive a
+round trip. Save returns 303 to the same scope/name. My snippets omits the Purpose
+column. System shows exact local files versus fallback and supports edit, download,
+replace, confirmed delete, and creation of missing overrides. Deleting a file leaves
+the system position. Scope links are generated from enabled languages plus Global;
+upload uses visible language/global radio buttons.
+
+Home SEO is edited at /admin/seo and stored in seo.php under home[language][title]
+and home[language][description]. Each field falls back from current to default
+language, then to legacy site.name/site.description. Site.name remains one system
+name. New seo.dist.php enables sitemap lastmod; existing seo.php is preserved.
+Sitemap uses valid updated_at, then legacy date, then file mtime. Date controls and
+permission semantics are described in [content.md](content.md).

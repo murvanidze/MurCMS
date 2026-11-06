@@ -1,7 +1,7 @@
 # MurCMS admin: content editing
 
 Date: 2026-09-07
-Status: current MurCMS 0.4.1 behavior
+Status: current MurCMS 0.4.2 behavior
 
 The pages and categories indexes use a compact three-column table. Title, ID
 and public URL share the first wide cell; status and row actions remain in
@@ -149,13 +149,14 @@ Nested categories use the `parent` field with the parent category `id`. Demo cat
 
 The page/category editor groups metadata into:
 
-- main parameters;
+- title and the full-width body editor first;
+- remaining main parameters;
 - page categories;
 - plugin fields such as tags;
 - SEO;
 - listing settings;
 - compact service parameters;
-- extra metadata and body.
+- extra metadata.
 
 Long fields use a two-column label/control layout on desktop and collapse to one column on narrow screens. Parameter labels in this editor are Russian in the current prototype.
 
@@ -272,8 +273,7 @@ root/data/snippets/{lang}/{name}.mur.md
 root/data/snippets/{name}.mur.md
 ```
 
-The snippets screen uses the same language grouping and includes reserved
-`system-*` insertion names in the normal snippet workflow.
+The snippets screen has four server-navigated tabs: Редактор, Мои сниппеты, Системные, Загрузка файла. The editor starts with Name and Body; metadata follows. Successful page/category/snippet saves use 303 PRG and retain the edited object.
 
 It also contains a scope-aware registry of all 11 system positions. The
 registry distinguishes an exact file from a global/default-language fallback
@@ -299,8 +299,6 @@ Snippet editing is admin-only because these files may contain scripts or embeds.
 ```text
 name
 description
-favicon_frontend
-favicon_admin
 ```
 
 Favicon paths are relative to `root/uploads/` and accept PNG, SVG, or WebP.
@@ -324,7 +322,7 @@ For new layouts, `menu:{name}` in the footer list is preferred because it gives
 an exact position; the separate footer menu checkbox remains a compatibility
 fallback.
 
-`Template → General` has a separate custom CSS form for the active frontend
+`Template → General` has a collapsed custom CSS disclosure with a separate form for the active frontend
 template. It stores trusted administrator content outside distributable
 template assets:
 
@@ -383,3 +381,19 @@ pagination.
 - A parent document cannot be deleted while it has children. A category cannot
   be deleted while pages still reference it.
 - `.htaccess` editing is in the SEO section and writes `root/.htaccess.bak` before replacing an existing file.
+
+## Updated_at in 0.4.2
+
+Service parameters contain six controls in site timezone: number Year/Seconds and
+select Month/Day/Hours/Minutes. The saved updated_at is shown; the write checkbox
+starts unchecked. Editing any part or clicking Now checks it. A live site clock is
+visible before clicking. Checking the checkbox alone does not change the fields;
+Submit writes exactly their displayed values. Unchecking preserves old metadata.
+If no updated_at exists, first Save creates it. Leap dates and nonexistent local
+times during DST are validated server-side. Publication date is a separate key.
+The pages list labels actual updated_at versus file timestamp fallback.
+
+Home/footer editors split title, body and extra metadata. Structured menu/gallery/
+carousel/counters/logos files keep their original raw file editors and syntax.
+The shared editor continues to allow only registered .mur.md/SEO paths; trusted
+PHP functions have a separate super_admin-only editor and path validator.

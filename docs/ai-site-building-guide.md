@@ -443,11 +443,11 @@ layout CSS через `media=print`.
 
 Базовая иконка CMS находится в `root/murcms/assets/site-icon.svg`. Default
 template использует её в HTML-brand и как fallback favicon. Favicon конкретного
-сайта настраивай в `/admin/settings/site`: ручной `favicon_frontend` имеет
+сайта настраивай в `/admin/settings/languages`: ручной `favicon_frontend` имеет
 приоритет, затем CMS ищет только в корне `root/uploads/` первый по имени
 `favicon*.png`, `favicon*.svg` или `favicon*.webp`, затем использует стандартную
 иконку. В подкаталог автоматический поиск не заходит, но ручной путь может
-указывать подкаталог. `favicon_admin` задаёт отдельную иконку админки; пустое
+указывать подкаталог. `favicon_admin` настраивается в `/admin/settings/admin` и задаёт отдельную иконку админки; пустое
 значение оставляет стандартную MurCMS-иконку.
 
 ## 11. Когда менять код и когда нужен дополнительный reference

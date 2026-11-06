@@ -1,4 +1,5 @@
 :root {
+  --admin-label-width: 220px;
   color-scheme: light;
   --admin-bg: #f5f7f8;
   --admin-surface: #ffffff;
@@ -11,6 +12,64 @@
   --admin-soft: #f5ffe0;
   --admin-danger: #9f2338;
   --admin-shadow: 0 18px 44px rgba(22, 32, 38, 0.08);
+}
+
+/* Shared compact settings rows. Wide editors and composite controls keep their space. */
+.admin-form > label:not(.admin-check):not(.admin-field-full):not(.admin-file-drop):not(:has(textarea)),
+.admin-form .admin-form-grid > label:not(.admin-check):not(.admin-field-full):not(:has(textarea)),
+.admin-form > fieldset > label:not(.admin-check):not(:has(textarea)) {
+  display: grid;
+  grid-template-columns: minmax(140px, var(--admin-label-width)) minmax(0, 1fr);
+  align-items: start;
+  gap: 5px 16px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--admin-line);
+}
+.admin-form > label > :is(input, select),
+.admin-form .admin-form-grid > label > :is(input, select),
+.admin-form > fieldset > label > :is(input, select),
+.admin-form label > .admin-help {
+  grid-column: 2;
+  min-width: 0;
+}
+.admin-form .admin-form-grid { grid-template-columns: minmax(0, 1fr); gap: 0; }
+.admin-form .admin-form-grid > label { margin: 0; }
+.admin-form > fieldset > label { margin-inline: 12px; }
+.admin-form :is(input, select, textarea) { min-width: 0; max-width: 100%; }
+.admin-form .admin-check > input { grid-column: auto; }
+.admin-form .admin-field-full > :is(input, select, textarea, .admin-help) { grid-column: 1; }
+.admin-document-field { padding-block: 9px; gap: 16px; }
+.admin-content, .admin-workspace, .admin-panel { min-width: 0; }
+.admin-navigation > summary { display: none; }
+.admin-tabs, .admin-scope-links { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 12px; }
+.admin-tabs { border-bottom: 1px solid var(--admin-line); }
+.admin-tabs a, .admin-scope-links a { display: inline-flex; align-items: center; min-height: 40px; padding: 7px 12px; border-radius: 5px 5px 0 0; text-decoration: none; }
+.admin-tabs a.is-active, .admin-scope-links a.is-active { background: var(--admin-soft); box-shadow: inset 0 -3px var(--admin-accent); font-weight: 700; }
+.admin-radio-group { display: flex; flex-wrap: wrap; gap: 8px 18px; min-width: 0; border: 0; padding: 8px 0; margin: 0; }
+.admin-radio-group legend { font-weight: 700; }
+.admin-radio-group input { width: 18px; min-height: 18px; }
+.admin-updated-at { min-width: 0; border: 0; padding: 12px 0; margin: 0; }
+.admin-updated-at legend { font-weight: 700; }
+.admin-date-fields { display: grid; grid-template-columns: 1.3fr repeat(5, 1fr); gap: 6px; margin-bottom: 10px; max-width: 700px; }
+.admin-date-fields label { font-size: 13px; }
+.admin-date-now { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 8px; }
+.admin-document-modified { min-width: 155px; font-size: 12px; }
+.admin-document-modified .admin-help { margin-top: 0; font-size: 11px; }
+:is(a, button, summary):focus-visible { outline: 3px solid var(--admin-accent); outline-offset: 2px; }
+@media (pointer: coarse) {
+  .admin-link-button { min-width: 44px; min-height: 44px; }
+  .admin-tag-pill { min-height: 36px; }
+}
+@media (max-width: 700px) {
+  .admin-form > label:not(.admin-check):not(.admin-field-full):not(.admin-file-drop):not(:has(textarea)),
+  .admin-form .admin-form-grid > label:not(.admin-check):not(.admin-field-full):not(:has(textarea)),
+  .admin-form > fieldset > label:not(.admin-check):not(:has(textarea)) { grid-template-columns: minmax(0, 1fr); gap: 5px; }
+  .admin-form label > :is(input, select, .admin-help) { grid-column: 1; }
+  .admin-date-fields { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .admin-tabs a { padding-inline: 9px; }
+}
+@media (max-width: 820px) {
+  .admin-navigation > summary { display: block; cursor: pointer; font-weight: 700; padding: 8px; border-top: 1px solid var(--admin-line); }
 }
 
 * {
@@ -243,7 +302,7 @@ textarea:focus {
 .admin-row-actions {
   display: inline-flex;
   flex-wrap: nowrap;
-  gap: 6px;
+  gap: 3px;
   min-width: max-content;
 }
 
@@ -555,9 +614,9 @@ textarea:focus {
 .admin-document-field {
   display: grid;
   grid-template-columns: minmax(170px, 230px) minmax(0, 1fr);
-  gap: 18px;
+  gap: 16px;
   align-items: start;
-  padding: 14px 16px;
+  padding: 9px 16px;
   border-bottom: 1px solid var(--admin-line);
 }
 
@@ -589,18 +648,18 @@ textarea:focus {
 .admin-tag-suggestions {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 10px;
+  gap: 3px 8px;
+  margin-top: 4px;
 }
 
 .admin-tag-pill {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  border: 1px solid var(--admin-line);
-  border-radius: 999px;
-  padding: 6px 10px;
-  background: var(--admin-soft);
+  gap: 4px;
+  border: 0;
+  border-radius: 3px;
+  padding: 2px 3px;
+  background: transparent;
   color: var(--admin-text);
   cursor: pointer;
   font: inherit;
@@ -935,13 +994,22 @@ textarea:focus {
 
 .admin-table {
   width: 100%;
+  min-width: 560px;
   border-collapse: collapse;
   overflow-wrap: anywhere;
 }
 
+.admin-table-scroll {
+  position: relative;
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
 .admin-table th,
 .admin-table td {
-  padding: 10px;
+  padding: 6px 8px;
   border-bottom: 1px solid var(--admin-line);
   text-align: left;
   vertical-align: top;
@@ -976,7 +1044,7 @@ textarea:focus {
 .admin-document-id,
 .admin-document-url {
   display: block;
-  margin-top: 4px;
+  margin-top: 1px;
   font-size: 12px;
   line-height: 1.35;
 }
@@ -1020,6 +1088,8 @@ textarea:focus {
   display: block;
   overflow-x: auto;
 }
+
+.admin-system-snippets td:first-child { white-space: nowrap; }
 
 .admin-system-snippets .admin-panel-head form {
   display: flex;

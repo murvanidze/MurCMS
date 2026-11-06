@@ -114,4 +114,8 @@ return [
     'Отмена' => 'Cancel',
     'Сохранить настройки' => 'Save settings',
     'Сохранить список плагинов' => 'Save plugin list',
+    'Настройки фронтенда' => 'Frontend settings',
+    'Управление плагинами' => 'Plugin management',
+    'PHP-функции' => 'PHP functions',
+    'Таблица' => 'Table',
 ];

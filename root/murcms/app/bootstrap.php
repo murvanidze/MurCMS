@@ -21,6 +21,8 @@ require MUR_ENGINE_PATH . '/app/Support/helpers.php';
 require MUR_ENGINE_PATH . '/app/Core/Hooks.php';
 require MUR_ENGINE_PATH . '/app/Core/Document.php';
 require MUR_ENGINE_PATH . '/app/Core/DocumentParser.php';
+require MUR_ENGINE_PATH . '/app/Core/DocumentDates.php';
+require MUR_ENGINE_PATH . '/app/Core/SiteFunctions.php';
 require MUR_ENGINE_PATH . '/app/Core/Slugger.php';
 require MUR_ENGINE_PATH . '/app/Core/ContentRepository.php';
 require MUR_ENGINE_PATH . '/app/Core/SeoManager.php';

@@ -1,7 +1,7 @@
 # MurCMS admin: users and access levels
 
 Date: 2026-09-07
-Status: current MurCMS 0.4.1 behavior
+Status: current MurCMS 0.4.2 behavior
 
 Users are stored in:
 
@@ -86,3 +86,7 @@ root/data/storage/backups/config/admin.php.bak.2
 
 The distribution starts with one `admin` username whose role is
 `super_admin`. No additional admin or editor demo account is created.
+
+## Site PHP (0.4.2)
+
+Only super_admin may access /admin/template/functions. Admin and editor receive 403 before the editor handler. Writes require CSRF; the shared .mur.md file editor never gains permission to write PHP. The profile remains available through the topbar user name and user-list links.

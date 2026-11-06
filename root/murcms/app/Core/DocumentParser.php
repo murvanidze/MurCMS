@@ -42,7 +42,7 @@ final class DocumentParser
         return [$parts[0], $parts[1]];
     }
 
-    private function parseHeader(string $header): array
+    public function parseHeader(string $header): array
     {
         $meta = [];
 
@@ -61,5 +61,20 @@ final class DocumentParser
         }
 
         return $meta;
+    }
+
+    public function serialize(array $meta, string $body): string
+    {
+        $header = '';
+        foreach ($meta as $key => $value) {
+            if (preg_match('/^[A-Za-z0-9_.-]+$/D', (string) $key) && is_scalar($value)) {
+                $value = trim((string) $value);
+                if (preg_match('/[\r\n\x00]/', $value)) {
+                    throw new \InvalidArgumentException('Metadata values must occupy one line.');
+                }
+                $header .= $key . ': ' . $value . "\n";
+            }
+        }
+        return rtrim($header) . "\n---\n\n" . rtrim($body) . "\n";
     }
 }

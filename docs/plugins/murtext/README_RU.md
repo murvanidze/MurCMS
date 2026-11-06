@@ -1,12 +1,17 @@
 # MurText для MurCMS
 
-Версия плагина: **0.2.3**  
+Версия плагина: **0.2.4**
 Версия ядра: **0.2.0**  
+
+В 0.2.4 обновлена единая краткая справка и добавлен защищённый read-only маршрут
+/admin/plugin/murtext/help с полной документацией, включённой в plugin update.
+Snippets и home/footer сохраняют parser/murtext.* перед --- через общий front
+matter. Специфичные меню/галереи/счётчики не включаются в MurText автоматически.
 Диалект: **murtext-1**  
 Целевая платформа: **PHP 8.5+**  
 Внешние зависимости: **нет**
 
-Текущий integration layer в core MurCMS имеет версию **0.2.3**. Parser core остаётся **0.2.0**; update-safe config model, введённая в 0.2.1, сохраняется.
+Текущий integration layer в core MurCMS имеет версию **0.2.4**. Parser core остаётся **0.2.0**; update-safe config model, введённая в 0.2.1, сохраняется.
 
 MurText — управляемый текстовый парсер для страниц, категорий, блоков главной и футера, а также snippets MurCMS. Плагин содержит ядро парсера, адаптер MurCMS, страницу глобальных настроек и необязательный помощник редактора.
 
@@ -21,11 +26,11 @@ MurText — управляемый текстовый парсер для стр
 - legacy `murcms/plugins/murtext/config.php` используется только как источник миграции старых установок;
 - канонический runtime-путь admin assets перенесён в `murcms/assets/plugins/murtext/`;
 - встроенная справка не ссылается на отсутствующий runtime-каталог `docs/`;
-- в интерфейсе отображаются раздельные версии: Plugin 0.2.3, Core 0.2.0, murtext-1.
+- в интерфейсе отображаются раздельные версии: Plugin 0.2.4, Core 0.2.0, murtext-1.
 
-## Packaging cleanup в 0.2.3
+## Packaging cleanup в 0.2.4
 
-Версия 0.2.3 устраняет дублирование admin assets, не меняя parser core `0.2.0`, диалект `murtext-1` или синтаксис MurText:
+Версия 0.2.4 устраняет дублирование admin assets, не меняя parser core `0.2.0`, диалект `murtext-1` или синтаксис MurText:
 
 - удалён неиспользуемый каталог `murcms/plugins/murtext/assets/`;
 - единственный канонический runtime-путь admin assets — `murcms/assets/plugins/murtext/`;
@@ -310,7 +315,7 @@ murcms/assets/plugins/murtext/admin.js
 
 ## Структура текущего production root
 
-Рабочие runtime-компоненты MurText в MurCMS 0.4.1 расположены так:
+Рабочие runtime-компоненты MurText в MurCMS 0.4.2 расположены так:
 
 ```text
 murcms/plugins/murtext/

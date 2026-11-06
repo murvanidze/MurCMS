@@ -1,11 +1,11 @@
 # MurCMS: текущий справочник системы
 
-Дата: 2026-09-07
-Статус: актуальный справочник стабильной версии `0.4.1`
+Дата: 2026-11-07
+Статус: актуальный справочник стабильной версии `0.4.2`
 
 Этот документ фиксирует то, что уже реализовано в MurCMS сейчас. Его цель - служить локальной инструкцией для сборки сайтов на этой платформе и контекстом для дальнейшей разработки.
 
-Текущая фаза: стабильная версия `0.4.1` собрана. Публикация на конкретном
+Текущая фаза: стабильная версия `0.4.2` собрана. Публикация на конкретном
 сервере требует server/release-проверки по [`prerelease-checklist.md`](prerelease-checklist.md).
 
 ## 1. Назначение
@@ -104,6 +104,7 @@ Assets активного frontend-шаблона находятся в `/murcms
     'redirects',
     'murconsent',
     'murtext',
+    'berrymur',
 ]
 ```
 
@@ -239,7 +240,7 @@ root/murcms/templates/default/
 
 Сейчас доступен один шаблон `default`. Он подключается через `TemplateManager`, а его параметры хранятся в `root/data/config/theme.php`.
 В главном меню админки после группы «Настройки» находится отдельная группа
-«Шаблон» с тремя страницами:
+«Шаблон» со страницами общих настроек, главной, футера и PHP-функций:
 
 - `/admin/template` — активный frontend-шаблон, базовые параметры `default`,
   brand, глобальные defaults списков, fallback footer-меню и файлы меню;
@@ -263,7 +264,7 @@ aspect ratio и не сжимается на промежуточных шири
 frontend и админки и как иконка рядом с брендом MurCMS в административном
 sidebar.
 
-Favicon настраивается в `/admin/settings/site`. Для frontend приоритет такой:
+Frontend favicon настраивается в «Настройки → Настройки фронтенда» (`/admin/settings/languages`), admin favicon — в «Настройки → Админка». Runtime keys остаются в site.php. Для frontend приоритет такой:
 
 1. существующий файл из `favicon_frontend`;
 2. первый по natural sort файл в корне `root/uploads/`, имя которого начинается
@@ -578,11 +579,14 @@ order, date, updated_at, title, id, filename
 
 Shortcodes должны стоять отдельной строкой, чтобы parser не завернул их в `<p>`.
 
+Shortcode promo доступен только при отдельной установке и включении Banerina.
+
 Поддерживаются:
 
 ```text
 [snippet=cta]
 [ushka=cta]
+[promo=promo-group]
 [gallery=nature-demo]
 [carousel=services]
 [counters=site]
@@ -662,6 +666,20 @@ Save.
 
 Порядок поиска: текущий язык, global, основной язык сайта. Найденный черновик
 ничего не выводит и останавливает fallback. Дистрибутивный default оставляет `allow_php` выключенным; фактическое значение определяется рабочим `data/config/snippets.php` конкретного сайта. Редактирование snippets остается доступно только роли `admin`.
+
+### Banerina
+
+Отдельно распространяемый plugin `root/murcms/plugins/banerina/` использует публичные hooks
+Snippets `snippets.render` и `snippets.registry` и не дублирует файловый lookup
+или renderer snippets. Shortcode `[promo=...]` принимает один snippet ID,
+явный список ID через запятую либо ID настроенной группы. Успешный результат
+оборачивается в `.mur-promo` с техническими `data-promo-*` атрибутами.
+
+Группы и настройки хранятся update-safe в
+`root/data/config/banerina.php`; distributable defaults находятся в
+`root/data/config/banerina.dist.php`. Управление доступно роли `admin` и выше по
+`/admin/plugin/banerina`. Полный runtime/admin contract описан в
+[`plugins/banerina.md`](plugins/banerina.md).
 
 ### Опциональный MurText
 
@@ -1204,7 +1222,7 @@ backward compatibility — намеренно не дублируется в э�
 нужно брать только из канонического Plugin API reference.
 
 При стандартном наборе включённых плагинов admin-пункты добавляют `blocks`,
-`gallery`, `tags`, `redirects`, `murconsent` и `murtext`. Snippets/ushki
+`gallery`, `tags`, `redirects`, `banerina`, `murconsent` и `murtext`. Snippets/ushki
 перенесены в базовый admin-раздел `/admin/content/snippets`, потому что это
 обязательная возможность системы.
 
@@ -1256,12 +1274,61 @@ documentation package не обязаны содержать `scripts/` или `
 - новые JS-модули должны быть условными и `defer`;
 - mobile и keyboard behavior проверять как часть задачи.
 
-## 25. Статус версии 0.4.1
+## 25. Статус версии 0.4.2
 
-Текущий стабильный release — `0.4.1`. Канонический источник версии и правила
+Текущий стабильный release — `0.4.2`. Канонический источник версии и правила
 release snapshot описаны в [`development/versioning-release.md`](development/versioning-release.md).
 
 Production readiness не выводится из этого справочника и не фиксируется здесь как результат
 конкретной локальной машины. Перед публикацией на целевом сервере необходимо выполнить
 [`prerelease-checklist.md`](prerelease-checklist.md), включая доступный repository smoke,
 server/security checks, staging-update verification и browser/accessibility checks.
+
+## 26. Контракты 0.4.2
+
+Стандартный package включает восемь плагинов: snippets, blocks, gallery, tags,
+redirects, murconsent, murtext, berrymur. Banerina 0.1.1 поставляется отдельно.
+Каждый имеет безопасно читаемый info.json; отсутствие metadata не мешает
+управлению плагином. Управление — первый пункт самостоятельной группы Плагины.
+
+Страницы/категории: Заголовок → Содержимое → прежние группы параметров, без
+новых вкладок. Snippets: Имя → Содержимое → scope/status/type/extra metadata.
+Snippets имеет четыре вкладки: Редактор, Мои сниппеты, Системные, Загрузка файла.
+После Save используется 303 PRG к тому же объекту. Параметры parser, murtext.*
+и расширяемые ключи остаются перед ---; home/footer также отделяют metadata
+от body. Меню, gallery и структурные blocks не обрабатываются как MurText.
+Системные позиции сохраняются после удаления локального файла, поддерживают
+все file actions и ссылки RU/RO/Global; draft останавливает fallback как раньше.
+
+Главная имеет языковые title/description в seo.php: home[lang][title|description].
+Fallback каждого поля: текущий язык → основной язык → site.name/site.description.
+Site.name — одно техническое название. Форма находится в SEO → Обзор.
+
+Updated_at страниц и категорий хранится как YYYY-MM-DD HH:MM:SS в timezone сайта.
+Шесть полей и «Сейчас» включают разрешающую галочку; ручная установка галочки
+не меняет показанное время. Без неё прежняя metadata не изменяется, отсутствующая
+дата создаётся при первом Save. Calendar/DST gaps отклоняются до записи. Список
+страниц различает metadata и файловый legacy fallback. Sitemap поддерживает
+ISO lastmod с fallback date/mtime; новый dist включает lastmod, существующий
+выбор остаётся прежним. Article modified-date/JSON-LD требует явного
+seo.type: Article, BlogPosting или NewsArticle; обычные страницы его не получают.
+
+Super_admin может редактировать data/templates/{resolved-template}/functions.php
+через Шаблон → PHP-функции. Синтаксическая проверка без исполнения, CSRF,
+backup/restore и atomic write; symlinks запрещены. Файл подключается require_once
+на публичном запросе до шаблона. Админка его не исполняет; update package не
+содержит site-owned файл. Это не включает PHP в snippets автоматически.
+
+Профиль открывается по имени в topbar и со списка пользователей. Favicons
+находятся в настройках фронтенда и админки, сохраняя ключи site.php. Общие формы
+используют двухколоночные строки, на mobile — одну колонку; большие редакторы
+широкие. Таблицы имеют общий scroll container, icon actions имеют доступные
+имена и увеличенные зоны на touch. Пользовательские CSS свёрнуты по умолчанию.
+
+MurText 0.2.4 содержит единую краткую справку и read-only полную по
+/admin/plugin/murtext/help; её plugin/help-копия синхронизируется с
+docs/plugins/murtext/CORE_README_RU.md. Parser core остаётся 0.2.0.
+BerryMur 1.0.0 сохраняет предоставленную логику локальной load/idle загрузки
+CSS для .mur-berry и noscript fallback; такие зоны размещаются ниже первого экрана.
+
+Миграция: [release notes 0.4.2](releases/0.4.2.md).

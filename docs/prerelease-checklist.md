@@ -157,7 +157,7 @@ root/.htaccess
   стандартной MurCMS-иконке.
 - Frontend admin bar виден с активной admin-сессией, содержит корректную ссылку
   редактирования/метаданные и отсутствует без admin cookie.
-- Если включён MurText `0.2.3`: его document overrides, toolbar, update-safe `data/config/murtext.php` и сохранение обычной формы редактора без вложенных `<form>`.
+- Если включён MurText `0.2.4`: его document overrides, toolbar, update-safe `data/config/murtext.php` и сохранение обычной формы редактора без вложенных `<form>`.
 - Root-only package MurText содержит ровно одну пару admin assets в `murcms/assets/plugins/murtext/`; каталог `murcms/plugins/murtext/assets/` отсутствует.
 - Если включён MurConsent `1.0.3`: `/admin/plugin/murconsent` доступен роли `admin` и выше; до согласия настроенные необязательные Google/Flag Counter resources не загружаются.
 - Проверить authorization regression для plugin admin routes по каноническому

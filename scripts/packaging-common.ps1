@@ -73,6 +73,13 @@ function Get-RepositoryFiles {
         [Parameter(Mandatory = $true)][string]$Scope
     )
 
+    $snapshotManifest = Join-Path $RepoRoot '.release-files.txt'
+    if (Test-Path -LiteralPath $snapshotManifest -PathType Leaf) {
+        return @(Get-Content -LiteralPath $snapshotManifest -Encoding UTF8 | Where-Object {
+            $_.StartsWith($Scope.TrimEnd('/') + '/') -and (Test-Path -LiteralPath (Join-Path $RepoRoot $_) -PathType Leaf)
+        } | Sort-Object -Unique)
+    }
+
     $tracked = @(& git -C $RepoRoot ls-files -- $Scope)
     if ($LASTEXITCODE -ne 0) {
         throw "Could not list tracked repository files under '$Scope'."
@@ -119,5 +126,15 @@ function New-PackZip {
         [Parameter(Mandatory = $true)]$Paths
     )
 
-    Compress-Archive -Path (Join-Path $Paths.PackDir '*') -DestinationPath $Paths.ZipPath -Force
+    Add-Type -AssemblyName System.IO.Compression.FileSystem
+    [System.IO.Compression.ZipFile]::CreateFromDirectory($Paths.PackDir, $Paths.ZipPath, [System.IO.Compression.CompressionLevel]::Optimal, $false)
+}
+
+function Test-StandardPackageFile {
+    param([Parameter(Mandatory = $true)][string]$Path)
+    return $Path -notmatch '^root/murcms/(?:plugins|assets/plugins)/banerina(?:/|$)' -and
+        $Path -ne 'root/data/config/banerina.dist.php' -and
+        $Path -notmatch '^root/data/templates/' -and
+        $Path -notmatch '^root/data/config/(?![^/]+\.dist\.php$)' -and
+        ($Path -notmatch '^root/data/storage/' -or $Path.EndsWith('/.gitkeep'))
 }

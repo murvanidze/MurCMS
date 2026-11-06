@@ -15,5 +15,6 @@ return [
         'redirects',
         'murconsent',
         'murtext',
+        'berrymur',
     ],
 ];

@@ -192,3 +192,9 @@
     });
   });
 })();
+document.querySelectorAll('.admin-navigation').forEach((navigation) => {
+  const mobile = window.matchMedia('(max-width: 820px)');
+  const updateNavigation = () => { navigation.open = !mobile.matches; };
+  updateNavigation();
+  mobile.addEventListener('change', updateNavigation);
+});

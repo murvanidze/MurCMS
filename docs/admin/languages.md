@@ -1,7 +1,7 @@
 # MurCMS admin: languages and admin UI i18n
 
 Date: 2026-09-07
-Status: current MurCMS 0.4.1 behavior
+Status: current MurCMS 0.4.2 behavior
 
 ## Frontend languages
 
@@ -117,3 +117,7 @@ return [
 Frontend language settings do not change the admin UI language.
 
 Admin UI language settings do not create public language branches and do not affect `/ru/`, `/ro/`, sitemap, menus or content folders.
+
+## Settings navigation in 0.4.2
+
+The existing /admin/settings/languages route is labelled Настройки фронтенда and contains Languages and Frontend favicon. The admin favicon is under /admin/settings/admin. Both favicon values retain site.php runtime keys; moving the controls does not reset them. My profile is linked from the topbar user name and the user list, and is absent from the Settings sidebar.

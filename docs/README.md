@@ -1,7 +1,7 @@
 # MurCMS documentation map
 
 Дата: 2026-09-07  
-Статус: актуально для MurCMS `0.4.1`
+Статус: актуально для MurCMS `0.4.2`
 
 Этот каталог содержит текущую документацию MurCMS, документацию штатных плагинов,
 release notes и отдельно изолированные исторические материалы. При расхождении текста
@@ -32,7 +32,8 @@ role semantics или backward compatibility.
 
 ## Релизы
 
-- [`releases/0.4.1.md`](releases/0.4.1.md) — текущий стабильный релиз;
+- [`releases/0.4.2.md`](releases/0.4.2.md) — текущий стабильный релиз;
+- [`releases/0.4.1.md`](releases/0.4.1.md) — исторический стабильный snapshot;
 - [`releases/0.4.0.md`](releases/0.4.0.md) — исторический стабильный snapshot;
 - [`releases/0.1.0-rc.1.md`](releases/0.1.0-rc.1.md) — исторический prerelease snapshot.
 

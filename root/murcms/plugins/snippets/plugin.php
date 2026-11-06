@@ -13,6 +13,7 @@ return static function (PluginContext $context): void {
     $plugin = new class ($context) {
         private DocumentParser $parser;
         private array $cache = [];
+        private ?array $registryCache = null;
         private array $config = ['allow_php' => false];
 
         public function __construct(private readonly PluginContext $context)
@@ -45,6 +46,88 @@ return static function (PluginContext $context): void {
             $language = (string) ($context['language'] ?? $this->context->languages['default'] ?? '');
 
             return $html . $this->render($name, $language);
+        }
+
+        public function apiRender(mixed $value, array $apiContext): mixed
+        {
+            $rawId = $apiContext['id'] ?? '';
+            $id = is_string($rawId) || is_int($rawId) ? trim((string) $rawId) : '';
+            if (preg_match('/^[A-Za-z0-9][A-Za-z0-9_-]*$/', $id) !== 1) {
+                return '';
+            }
+
+            $rawLanguage = $apiContext['language'] ?? $this->context->languages['default'] ?? '';
+            $language = is_string($rawLanguage) ? trim($rawLanguage) : '';
+            if (preg_match('/^[a-z]{2}$/D', $language) !== 1) {
+                $language = (string) ($this->context->languages['default'] ?? '');
+            }
+            return $this->render($id, $language);
+        }
+
+        public function apiRegistry(mixed $value, array $apiContext): array
+        {
+            if ($this->registryCache !== null) {
+                return $this->registryCache;
+            }
+
+            $root = $this->context->path('snippets');
+            if (!is_dir($root)) {
+                return $this->registryCache = [];
+            }
+
+            $registry = [];
+            $scan = function (string $directory, string $scope) use (&$registry): void {
+                if (!is_dir($directory)) {
+                    return;
+                }
+
+                $files = glob($directory . '/*') ?: [];
+                foreach ($files as $file) {
+                    if (!is_file($file)) {
+                        continue;
+                    }
+
+                    $basename = basename($file);
+                    $id = '';
+                    $format = '';
+                    if (str_ends_with($basename, '.mur.md')) {
+                        $id = substr($basename, 0, -7);
+                        $format = 'mur.md';
+                    } elseif (str_ends_with($basename, '.html')) {
+                        $id = substr($basename, 0, -5);
+                        $format = 'html';
+                    }
+
+                    if ($id === '' || preg_match('/^[A-Za-z0-9][A-Za-z0-9_-]*$/', $id) !== 1) {
+                        continue;
+                    }
+
+                    if (!isset($registry[$id])) {
+                        $registry[$id] = [
+                            'id' => $id,
+                            'scopes' => [],
+                            'formats' => [],
+                        ];
+                    }
+                    if (!in_array($scope, $registry[$id]['scopes'], true)) {
+                        $registry[$id]['scopes'][] = $scope;
+                    }
+                    if (!in_array($format, $registry[$id]['formats'], true)) {
+                        $registry[$id]['formats'][] = $format;
+                    }
+                }
+            };
+
+            $scan($root, 'global');
+            foreach (glob($root . '/*', GLOB_ONLYDIR) ?: [] as $directory) {
+                $scope = basename($directory);
+                if (preg_match('/^[a-z]{2}$/', $scope) === 1) {
+                    $scan($directory, $scope);
+                }
+            }
+
+            ksort($registry, SORT_NATURAL | SORT_FLAG_CASE);
+            return $this->registryCache = array_values($registry);
         }
 
         private function render(string $name, string $language): string
@@ -128,6 +211,9 @@ return static function (PluginContext $context): void {
             return (string) ob_get_clean();
         }
     };
+
+    $context->hooks->add('snippets.render', [$plugin, 'apiRender']);
+    $context->hooks->add('snippets.registry', [$plugin, 'apiRegistry']);
 
     foreach (['content.home', 'content.document', 'layout.footer'] as $hook) {
         $context->hooks->add($hook, [$plugin, 'filter']);

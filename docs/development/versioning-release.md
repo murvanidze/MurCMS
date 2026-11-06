@@ -1,7 +1,7 @@
 # MurCMS versioning and release process
 
 Дата: 2026-09-07  
-Статус: канонический versioning reference для MurCMS `0.4.1`
+Статус: канонический versioning reference для MurCMS `0.4.2`
 
 ## Canonical CMS version
 
@@ -14,7 +14,7 @@ root/murcms/app/version.php
 Текущая версия:
 
 ```text
-0.4.1
+0.4.2
 ```
 
 Bootstrap загружает это значение и публикует его как `MUR_CMS_VERSION`; Dashboard показывает ту же
@@ -24,7 +24,7 @@ Bootstrap загружает это значение и публикует ег�
 ## Plugin versions
 
 Версии штатных и сторонних plugins независимы от версии MurCMS. Например, текущий MurConsent имеет
-версию `1.0.3`, а MurText integration plugin — `0.2.3` при parser core `0.2.0`.
+версию `1.0.3`, а MurText integration plugin — `0.2.4` при parser core `0.2.0`.
 
 Если плагин имеет собственный canonical version constant/class, его документация должна ссылаться на
 эту версию. Не следует выводить версию плагина из версии CMS.
@@ -88,3 +88,11 @@ HTTP regression suite.
 
 Если машинная проверка обнаружила расхождение, приоритет определения факта имеет canonical code source,
 а затем вручную обновляется соответствующий source-of-truth document.
+
+## Metadata baseline 0.4.2
+
+В каталоге каждого плагина находится расширяемый info.json: name, version, description; author, website, license факультативны. Менеджер читает JSON без исполнения plugin.php; отсутствующий, повреждённый, слишком большой или нестроковый metadata безопасно игнорируется. ID берётся из каталога.
+
+Git 41589d6 и текущие docs не подтверждают прежние независимые версии blocks, gallery, redirects, snippets, tags. Для blocks/gallery/redirects/tags впервые документирован baseline 1.0.0 в выпуске CMS 0.4.2; это назначение, а не утверждение об их прошлых релизах. Для Snippets принят baseline 1.0.0 до расширения API, а текущие snippets.render/registry и проверка языка документированы как 1.1.0. MurConsent остаётся 1.0.3, MurText integration 0.2.4 / core 0.2.0, BerryMur 1.0.0. Проверенная исходная Banerina имела VERSION 0.1.0; UI patch повышает её до 0.1.1.
+
+Сборка полного релиза: scripts/build-release.ps1 -Commit HEAD. Скрипт требует чистых tracked файлов, экспортирует зафиксированный commit через git archive и строит все пакеты из snapshot, затем проверяет manifests и SHA-256. Локальные файлы, включая рабочие конфиги и site functions.php, в snapshot не включаются.

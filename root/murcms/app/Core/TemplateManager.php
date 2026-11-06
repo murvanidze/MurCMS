@@ -23,7 +23,7 @@ final class TemplateManager
 
     public function load(): FrontendTemplate
     {
-        $name = $this->safeName((string) ($this->config['active'] ?? 'default'));
+        $name = self::resolvedName($this->templatesPath, $this->config);
         $path = $this->templatesPath . '/' . $name;
         $file = $path . '/template.php';
 
@@ -72,6 +72,13 @@ final class TemplateManager
         sort($items, SORT_NATURAL);
 
         return $items;
+    }
+
+    public static function resolvedName(string $templatesPath, array $config): string
+    {
+        $name = strtolower(trim((string) ($config['active'] ?? 'default')));
+        return preg_match('/^[a-z0-9][a-z0-9_-]*$/D', $name) && is_file($templatesPath . '/' . $name . '/template.php')
+            ? $name : 'default';
     }
 
     private function safeName(string $name): string

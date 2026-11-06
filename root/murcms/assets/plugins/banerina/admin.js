@@ -1,0 +1,1 @@
+(()=>{const input=document.querySelector('[data-banerina-snippet-search]');if(!input)return;const items=[...document.querySelectorAll('[data-banerina-snippet-item]')];input.addEventListener('input',()=>{const q=input.value.trim().toLowerCase();for(const item of items){item.hidden=q!==''&&!String(item.dataset.banerinaSnippetItem||'').includes(q);}});})();

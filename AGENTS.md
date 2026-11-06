@@ -2,16 +2,15 @@
 
 This repository contains the current MurCMS prerelease candidate. Before changing code or content, read:
 
-- `docs/murcms-current-reference.md`
+- `docs/current-reference.md`
 
 For building or adapting a complete website on MurCMS, also read:
 
 - `docs/ai-site-building-guide.md`
 - `docs/prerelease-checklist.md`
 
-Before synchronizing engine changes to the Parastas installation, read:
-
-- `docs/parastas-sync-status.md`
+Before synchronizing engine changes to a separate installation such as Parastas,
+obtain and read its current installation-specific sync notes.
 
 Project priorities:
 
@@ -52,12 +51,12 @@ Admin:
 - Admin routes live under `/admin/`.
 - Auth config is `root/data/config/admin.php`.
 - Current roles are `super_admin`, `admin`, and `editor`; see
-  `docs/admin-users-current.md`. Legacy `content` is an editor alias only.
+  `docs/admin/users.md`. Legacy `content` is an editor alias only.
 - Plugin admin extensions use `admin.menu` and `admin.route` hooks.
 - Do not add write/edit actions without CSRF, role checks, and careful filesystem path validation.
-- SEO is a core admin section, not a plugin. See `docs/admin-seo-snippets-current.md`.
+- SEO is a core admin section, not a plugin. See `docs/admin/seo-snippets.md`.
 - Snippets/"ushki" are edited at `/admin/content/snippets` and can contain sensitive HTML, so keep write access admin-only.
-- Current admin content editing behavior is documented in `docs/admin-content-editing-current.md`.
-- Current admin file/image manager behavior is documented in `docs/admin-media-manager-current.md`.
-- Current frontend/admin language behavior is documented in `docs/admin-languages-current.md`.
+- Current admin content editing behavior is documented in `docs/admin/content.md`.
+- Current admin file/image manager behavior is documented in `docs/admin/media.md`.
+- Current frontend/admin language behavior is documented in `docs/admin/languages.md`.
 - The shared admin file editor may only write allowlisted `.mur.md`/SEO files inside the CMS root; preserve that constraint when adding editors.

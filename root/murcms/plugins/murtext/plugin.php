@@ -37,4 +37,9 @@ return static function (PluginContext $context): void {
         'role' => 'admin',
         'handler' => [$admin, 'adminRoute'],
     ]);
+    $context->registerAdminRoute([
+        'path' => '/admin/plugin/murtext/help',
+        'role' => 'admin',
+        'handler' => [$admin, 'fullHelp'],
+    ]);
 };

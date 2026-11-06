@@ -120,6 +120,17 @@ final class DefaultTemplate implements FrontendTemplate
             ? '<script src="' . mur_escape($this->assetUrl('menu.js')) . '" defer></script>'
             : '';
         $customCss = $this->customCssHead();
+        $articleMeta = '';
+        $articleType = (string) ($document?->meta['seo.type'] ?? '');
+        $isArticle = $document !== null && in_array($articleType, ['Article', 'BlogPosting', 'NewsArticle'], true);
+        if ($isArticle) {
+            $modified = \Mur\Core\DocumentDates::parse((string) ($document->meta['updated_at'] ?? ''), (string) ($this->context->site['timezone'] ?? 'UTC'));
+            if ($modified !== null) {
+                $articleMeta = '<meta property="article:modified_time" content="' . mur_escape($modified->format(DATE_ATOM)) . '">';
+                $json = json_encode(['@context' => 'https://schema.org', '@type' => $articleType, 'headline' => $title, 'url' => $canonical, 'dateModified' => $modified->format(DATE_ATOM)], JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
+                $articleMeta .= '<script type="application/ld+json">' . $json . '</script>';
+            }
+        }
 
         return '<!doctype html>
 <html lang="' . mur_escape($language) . '">
@@ -134,7 +145,8 @@ final class DefaultTemplate implements FrontendTemplate
   <meta property="og:title" content="' . mur_escape($title) . '">
   <meta property="og:description" content="' . mur_escape($description) . '">
   <meta property="og:url" content="' . mur_escape($canonical) . '">
-  <meta property="og:type" content="website">
+  <meta property="og:type" content="' . ($isArticle ? 'article' : 'website') . '">
+  ' . $articleMeta . '
   ' . $this->criticalCss() . '
   <link rel="stylesheet" href="' . mur_escape($this->assetUrl('app.css')) . '">
   <link rel="stylesheet" href="' . mur_escape(mur_color_scheme_url($this->context->name, (string) $this->options['color_scheme'])) . '">

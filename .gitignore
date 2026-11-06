@@ -1,4 +1,5 @@
 /root/data/config/*.php
+/root/data/templates/
 !/root/data/config/*.dist.php
 
 /root/data/storage/cache/*
@@ -16,4 +17,5 @@
 /_deploy/
 /_dist/
 /root.zip
+/docs.zip
 /sources/

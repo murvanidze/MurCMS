@@ -1,7 +1,7 @@
 # MurCMS production distribution quick start
 
 Дата: 2026-09-07  
-Статус: краткий сценарий для MurCMS `0.4.1`
+Статус: краткий сценарий для MurCMS `0.4.2`
 
 Полные требования и update-safe правила находятся в
 [`installation-update.md`](installation-update.md). Этот файл не дублирует весь installation reference.

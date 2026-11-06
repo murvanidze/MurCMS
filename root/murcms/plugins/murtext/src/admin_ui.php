@@ -77,6 +77,9 @@ final class AdminUi
     public function saveDocumentMeta(array $meta, array $adminContext): array
     {
         $post = is_array($adminContext['post'] ?? null) ? $adminContext['post'] : [];
+        if (!array_key_exists('murtext_parser', $post)) {
+            return $meta;
+        }
         $this->storeChoice($meta, 'parser', (string) ($post['murtext_parser'] ?? ''), ['murtext', 'native']);
         $this->storeChoice($meta, 'murtext.paragraph_mode', (string) ($post['murtext_paragraph_mode'] ?? ''), ['blank_lines', 'line']);
         $this->storeChoice($meta, 'murtext.pretty', (string) ($post['murtext_pretty'] ?? ''), ['0', '1']);
@@ -86,6 +89,9 @@ final class AdminUi
 
     public function knownMetaKeys(array $keys): array
     {
+        if (($this->config['editor']['document_overrides'] ?? true) !== true) {
+            return $keys;
+        }
         return array_values(array_unique(array_merge($keys, [
             'parser',
             'murtext.paragraph_mode',
@@ -156,7 +162,7 @@ final class AdminUi
         $warnings = $this->configWarningsHtml();
         $versionLine = 'Plugin ' . Version::PLUGIN . ' · Core ' . $this->coreVersion() . ' · ' . Version::DIALECT;
 
-        return $warnings . '<section class="admin-panel">
+        return '<link rel="stylesheet" href="' . mur_escape(mur_asset_url('plugins/murtext/admin.css')) . '">' . $warnings . '<section class="admin-panel">
   <div class="admin-panel-head"><div><h2>MurText</h2><p>Лёгкий управляемый парсер контента для MurCMS.</p></div><code>' . mur_escape($versionLine) . '</code></div>
   <form class="admin-form" method="post" action="/admin/plugin/murtext">
     <input type="hidden" name="_csrf" value="' . mur_escape((string) ($user['csrf'] ?? '')) . '">
@@ -313,9 +319,20 @@ final class AdminUi
         return match ((string) ($context['editor'] ?? '')) {
             'document' => ($surfaces['document'] ?? true) === true,
             'snippet' => ($surfaces['snippet'] ?? true) === true,
-            'file' => ($context['scope'] ?? '') === 'content-blocks' && ($surfaces['content_blocks'] ?? true) === true,
+            'file' => in_array(($context['scope'] ?? ''), ['home', 'footer'], true) && ($surfaces['content_blocks'] ?? true) === true,
             default => false,
         };
+    }
+
+    public function fullHelp(mixed $html, array $adminContext): string
+    {
+        $file = $this->pluginPath . '/help/CORE_README_RU.md';
+        $source = is_file($file) ? file_get_contents($file) : false;
+        if (!is_string($source)) {
+            http_response_code(404);
+            return '<section class="admin-panel"><p>Документ справки отсутствует.</p></section>';
+        }
+        return '<link rel="stylesheet" href="' . mur_escape(mur_asset_url('plugins/murtext/admin.css')) . '"><section class="admin-panel"><h2>MurText — полная документация</h2><p><a href="/admin/plugin/murtext">MurText</a> · docs/plugins/murtext/CORE_README_RU.md</p><pre class="murtext-full-help">' . mur_escape($source) . '</pre></section>';
     }
 
     private function helpContent(): string
@@ -328,11 +345,18 @@ final class AdminUi
 <tr><th>Ссылка</th><td><code>[Название](https://example.com)</code></td></tr>
 <tr><th>Изображение</th><td><code>![Описание](//photo.webp)</code></td></tr>
 <tr><th>Блок</th><td><code>div(class)</code> … <code>/div</code></td></tr>
+<tr><th>Короткий DIV</th><td><code>__ Текст</code>, <code>__(notice) Текст</code>. Пробел или скобка после __ создаёт div; <code>__жирный__</code> — полужирный текст.</td></tr>
 <tr><th>Список</th><td><code>- Пункт</code>; два пробела создают вложенность</td></tr>
+<tr><th>Нумерация / TODO</th><td><code>1. Пункт</code>, <code>- [x] Готово</code>, <code>- [ ] Задача</code></td></tr>
+<tr><th>Цитата</th><td><code>&gt; Текст</code>, <code>&gt;(notice) Текст</code></td></tr>
+<tr><th>Атрибуты</th><td><code>h2(title)#intro{data-section="intro"} Заголовок</code>; классы: <code>(notice)</code>; стили во второй скобке: <code>(color: red)</code></td></tr>
 <tr><th>Таблица</th><td><code>|: Заголовок :|</code> и <code>| Ячейка |</code> внутри <code>table</code></td></tr>
+<tr><th>Код</th><td><code>`код`</code>; блок между строками <code>```php</code> и <code>```</code></td></tr>
+<tr><th>Details</th><td><code>details</code>, следующая строка <code>summary Заголовок</code>, текст, <code>/details</code>. <code>details+</code> открыт сразу.</td></tr>
+<tr><th>Изображение</th><td><code>![Описание](//photo.webp){width="400" height="300"}</code>; <code>!![Описание](//photo.webp)</code> — изображение-ссылка</td></tr>
 <tr><th>Без обработки</th><td><code>raw</code> … <code>/raw</code></td></tr>
 </tbody></table>
-<p>Полная документация MurText входит в documentation package MurCMS. Активация: <code>parser: murtext</code>; отключение: <code>parser: native</code>.</p></div>';
+<p>Активация: <code>parser: murtext</code>; отключение: <code>parser: native</code>.</p><p><a href="/admin/plugin/murtext/help" target="_blank" rel="noopener">Полная документация — CORE_README_RU.md</a></p></div>';
     }
 
     private function selectField(string $label, string $name, array $options, string $current): string

@@ -148,8 +148,10 @@ if ($adminRouter->matches($_SERVER['REQUEST_URI'] ?? '/')) {
     return;
 }
 
+$siteFunctions = new \Mur\Core\SiteFunctions(mur_data_path(), TemplateManager::resolvedName(mur_engine_path('templates'), $config['theme']));
+$siteFunctions->load();
 $template = (new TemplateManager(mur_engine_path('templates'), $config['theme'], $config['site'], $config['languages'], $content, $menu, $hooks))->load();
-$renderer = new Renderer($config['site'], $config['languages'], $content, $menu, $hooks, $template, $config['theme']);
+$renderer = new Renderer($config['site'], $config['languages'], $content, $menu, $hooks, $template, $config['theme'], $config['seo']);
 $router = new Router($config['site'], $config['languages'], $content, $renderer, $seo, $hooks);
 
 $router->handle($_SERVER['REQUEST_URI'] ?? '/');

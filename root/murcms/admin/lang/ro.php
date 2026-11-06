@@ -114,4 +114,8 @@ return [
     'Отмена' => 'Anulare',
     'Сохранить настройки' => 'Salvează setările',
     'Сохранить список плагинов' => 'Salvează lista pluginurilor',
+    'Настройки фронтенда' => 'Setări frontend',
+    'Управление плагинами' => 'Gestionare pluginuri',
+    'PHP-функции' => 'Funcții PHP',
+    'Таблица' => 'Tabel',
 ];

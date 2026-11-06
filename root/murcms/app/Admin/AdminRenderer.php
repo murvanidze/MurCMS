@@ -40,6 +40,7 @@ final class AdminRenderer
 
     public function page(string $title, string $content, array $navGroups, array $user, string $active): string
     {
+        $content = preg_replace('~(<table\b[^>]*class="[^"]*\badmin-table\b[^"]*"[^>]*>.*?</table>)~s', '<div class="admin-table-scroll" tabindex="0" role="region" aria-label="' . mur_escape($this->t('Таблица')) . '">$1</div>', $content) ?? $content;
         $nav = '';
 
         foreach ($navGroups as $group) {
@@ -73,7 +74,7 @@ final class AdminRenderer
       <a class="admin-brand" href="/admin/"><img class="admin-brand-icon" src="' . mur_escape(mur_asset_url('site-icon.svg')) . '" width="32" height="32" alt="" aria-hidden="true"><span>MurCMS</span></a>
       <span class="admin-site-name" title="' . mur_escape((string) ($this->site['name'] ?? '')) . '">' . mur_escape((string) ($this->site['name'] ?? '')) . '</span>
     </div>
-    <nav class="admin-nav" aria-label="' . mur_escape($this->t('Admin menu')) . '">' . $nav . '</nav>
+    <details class="admin-navigation" open><summary>' . mur_escape($this->t('Меню')) . '</summary><nav class="admin-nav" aria-label="' . mur_escape($this->t('Admin menu')) . '">' . $nav . '</nav></details>
   </aside>
   <div class="admin-workspace">
     <header class="admin-topbar">
@@ -83,7 +84,7 @@ final class AdminRenderer
       </div>
       <form method="post" action="/admin/logout">
         <input type="hidden" name="_csrf" value="' . mur_escape((string) ($user['csrf'] ?? '')) . '">
-        <span>' . mur_escape((string) ($user['display_name'] ?? $user['username'] ?? '')) . '</span>
+        <a href="/admin/settings/profile">' . mur_escape((string) ($user['display_name'] ?? $user['username'] ?? '')) . '</a>
         <button class="admin-button admin-button--ghost" type="submit">' . $this->icon('logout') . '<span>' . mur_escape($this->t('Выйти')) . '</span></button>
       </form>
     </header>
@@ -92,6 +93,9 @@ final class AdminRenderer
 </div>';
 
         $scripts = '<script src="' . mur_escape(mur_asset_url('admin-theme.js')) . '" defer></script>';
+        if (str_contains($content, 'data-updated-at')) {
+            $scripts .= '<script src="' . mur_escape(mur_asset_url('admin-dates.js')) . '" defer></script>';
+        }
 
         return $this->document($this->t($title), $html, $scripts);
     }

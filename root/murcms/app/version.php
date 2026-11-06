@@ -6,4 +6,4 @@ if (!defined('MUR_CMS_BOOTSTRAPPED')) {
     exit('No direct script access allowed.');
 }
 
-return '0.4.1';
+return '0.4.2';

@@ -10,7 +10,7 @@ $RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
 
 $CmsVersion = Get-MurCmsVersion -RepoRoot $RepoRoot
 if ([string]::IsNullOrWhiteSpace($PackName)) {
-    $PackName = "murcms-$CmsVersion-update"
+    $PackName = "MurCMS-$CmsVersion-update"
 }
 
 $Paths = Get-PackPaths -RepoRoot $RepoRoot -PackName $PackName
@@ -18,13 +18,12 @@ Reset-PackDirectory -Paths $Paths
 
 $rootFiles = @(Get-RepositoryFiles -RepoRoot $RepoRoot -Scope 'root')
 $overlayFiles = @(
-    $rootFiles | Where-Object {
+    $rootFiles | Where-Object { (Test-StandardPackageFile $_) -and (
         $_ -eq 'root/index.php' -or
         $_.StartsWith('root/murcms/', [System.StringComparison]::Ordinal) -or
         ($_.StartsWith('root/data/config/', [System.StringComparison]::Ordinal) -and
-            $_.EndsWith('.dist.php', [System.StringComparison]::OrdinalIgnoreCase)) -or
-        $_ -eq 'root/uploads/.htaccess'
-    }
+            $_.EndsWith('.dist.php', [System.StringComparison]::OrdinalIgnoreCase))
+    ) }
 )
 
 if ($overlayFiles.Count -eq 0) {
@@ -42,6 +41,8 @@ Copy-PackFile `
     -PackDir $Paths.PackDir `
     -SourceRelativePath 'root/.htaccess' `
     -DestinationRelativePath '_manual-review/root/.htaccess'
+
+Copy-PackFile -RepoRoot $RepoRoot -PackDir $Paths.PackDir -SourceRelativePath 'root/uploads/.htaccess' -DestinationRelativePath '_manual-review/root/uploads/.htaccess'
 
 Copy-PackFile `
     -RepoRoot $RepoRoot `
@@ -67,7 +68,8 @@ document root: the directory that already contains `index.php`, `murcms/`, `data
 and `uploads/`. Do not create an extra `root/` level on the server.
 
 The overlay replaces engine, admin, template, plugin code, and public plugin assets.
-It also updates `data/config/*.dist.php` templates and `uploads/.htaccess`.
+It also updates `data/config/*.dist.php` templates. Both `.htaccess` files are
+provided under `_manual-review/` for manual comparison, outside the overlay.
 
 ## Preserved by design
 
@@ -77,6 +79,7 @@ The overlay does not contain or overwrite:
 - content, menus, snippets, blocks, galleries, storage, cache, logs, or backups;
 - user files and site-specific CSS under `uploads/`;
 - the working root `.htaccess`.
+- site-owned `data/templates/*/functions.php` and the working uploads `.htaccess`.
 
 Compare new `*.dist.php` keys with the site's working configs and merge only the
 required settings. The canonical root `.htaccess` is supplied under `_manual-review/`;
@@ -109,6 +112,8 @@ $forbiddenOverlayPaths = @(
     'data/blocks',
     'data/galleries',
     'data/storage',
+    'data/templates',
+    'uploads',
     '.htaccess'
 )
 foreach ($relativePath in $forbiddenOverlayPaths) {
@@ -123,14 +128,6 @@ $workingConfigs = @(
 )
 if ($workingConfigs.Count -gt 0) {
     throw "Update overlay contains working config: root/data/config/$($workingConfigs[0].Name)"
-}
-
-$uploadFiles = @(
-    Get-ChildItem -LiteralPath (Join-Path $overlayRoot 'uploads') -Recurse -File |
-        Where-Object { $_.FullName -ne (Join-Path $overlayRoot 'uploads/.htaccess') }
-)
-if ($uploadFiles.Count -gt 0) {
-    throw "Update overlay contains user upload data: $($uploadFiles[0].FullName)"
 }
 
 $deleteEntries = @(

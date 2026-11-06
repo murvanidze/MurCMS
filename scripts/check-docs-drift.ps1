@@ -394,6 +394,31 @@ foreach ($relativePath in $toolingBoundaryDocs) {
     }
 }
 
+# Release 0.4.2 inventory and the installable copy of the canonical MurText help.
+$bundledIds = @('snippets', 'blocks', 'gallery', 'tags', 'redirects', 'murconsent', 'murtext', 'berrymur')
+foreach ($pluginId in @($bundledIds + 'banerina')) {
+    $infoPath = Join-Path $ProjectRoot "root/murcms/plugins/$pluginId/info.json"
+    try {
+        $info = Read-Utf8 $infoPath | ConvertFrom-Json
+        if ($info.name -isnot [string] -or $info.version -isnot [string] -or $info.description -isnot [string]) { Add-Drift "Invalid metadata for $pluginId" }
+        $expected = switch ($pluginId) {
+            'murconsent' { $murConsentVersion }
+            'murtext' { $murTextPluginVersion }
+            'snippets' { '1.1.0' }
+            'berrymur' { '1.0.0' }
+            'banerina' { '0.1.1' }
+            default { '1.0.0' }
+        }
+        if ($info.version -ne $expected) { Add-Drift "Plugin version mismatch: $pluginId" }
+    } catch { Add-Drift "Cannot decode $pluginId info.json" }
+}
+$distPlugins = Read-Utf8 (Join-Path $ProjectRoot 'root/data/config/plugins.dist.php')
+$actualIds = @([regex]::Matches($distPlugins, "(?m)^\s*'(?<id>[a-z0-9_-]+)',?\s*$") | ForEach-Object { $_.Groups['id'].Value } | Sort-Object)
+if (($actualIds -join ',') -ne (($bundledIds | Sort-Object) -join ',')) { Add-Drift 'Standard distribution must contain eight plugins, with Banerina separate.' }
+$canonicalHelp = Join-Path $DocsRoot 'plugins/murtext/CORE_README_RU.md'
+$installedHelp = Join-Path $ProjectRoot 'root/murcms/plugins/murtext/help/CORE_README_RU.md'
+if (-not (Test-Path -LiteralPath $installedHelp) -or (Get-FileHash -LiteralPath $canonicalHelp).Hash -ne (Get-FileHash -LiteralPath $installedHelp).Hash) { Add-Drift 'Installable MurText help differs from canonical documentation.' }
+
 if ($Drift.Count -gt 0) {
     Write-Host "Documentation drift detected ($($Drift.Count) issue(s)):" -ForegroundColor Red
     foreach ($issue in $Drift) {

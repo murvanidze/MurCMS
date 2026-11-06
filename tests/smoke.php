@@ -56,11 +56,7 @@ $check(
     'Distribution config must retain compromised credential hashes for production detection.',
 );
 $distributionPlugins = require $projectRoot . '/root/data/config/plugins.dist.php';
-$check(
-    in_array('murconsent', (array) ($distributionPlugins['enabled'] ?? []), true)
-    && in_array('murtext', (array) ($distributionPlugins['enabled'] ?? []), true),
-    'MurConsent or MurText is missing from the distribution plugin list.',
-);
+$check(count($distributionPlugins['enabled']) === 8 && in_array('berrymur', $distributionPlugins['enabled'], true) && !in_array('banerina', $distributionPlugins['enabled'], true), 'Distribution must contain eight bundled plugins including BerryMur, with Banerina distributed separately.');
 $legacyConsentId = 'privacy' . '-consent';
 $check(!in_array($legacyConsentId, (array) ($distributionPlugins['enabled'] ?? []), true), 'The retired consent plugin is still enabled in the distribution.');
 
@@ -427,9 +423,10 @@ $systemSnippetData = $systemSnippetRoot . '/data';
 $systemSnippetFiles = [
     $systemSnippetData . '/snippets/system-header-before.mur.md' => "id: system-header-before\nstatus: published\ntype: html\n---\n\n<span>GLOBAL-HEADER-BEFORE</span>\n",
     $systemSnippetData . '/snippets/ru/normal.mur.md' => "id: normal\nstatus: published\ntype: html\n---\n\n<span>NORMAL-SNIPPET</span>\n",
+    $systemSnippetData . '/snippets/ru/alternate.mur.md' => "id: alternate\nstatus: published\ntype: html\n---\n\n<span>ALTERNATE-SNIPPET</span>\n",
 ];
 try {
-    foreach ([$systemSnippetData . '/content/ru/pages', $systemSnippetData . '/content/ru/footer', $systemSnippetData . '/menus/ru', $systemSnippetData . '/snippets/ru'] as $directory) {
+    foreach ([$systemSnippetData . '/content/ru/pages', $systemSnippetData . '/content/ru/footer', $systemSnippetData . '/menus/ru', $systemSnippetData . '/snippets/ru', $systemSnippetData . '/config'] as $directory) {
         if (!is_dir($directory)) {
             mkdir($directory, 0775, true);
         }
@@ -437,13 +434,25 @@ try {
     foreach ($systemSnippetFiles as $file => $content) {
         file_put_contents($file, $content, LOCK_EX);
     }
+    $banerinaConfig = [
+        'settings' => ['avoid_duplicates' => true, 'selection_mode' => 'random', 'diagnostics_logging' => false],
+        'groups' => [
+            'rotation' => ['id' => 'rotation', 'name' => 'Rotation', 'description' => '', 'active' => true, 'snippets' => ['normal', 'alternate']],
+            'inactive' => ['id' => 'inactive', 'name' => 'Inactive', 'description' => '', 'active' => false, 'snippets' => ['normal']],
+        ],
+    ];
+    file_put_contents(
+        $systemSnippetData . '/config/banerina.php',
+        "<?php\ndeclare(strict_types=1);\n\nif (!defined('MUR_CMS_BOOTSTRAPPED')) {\n    http_response_code(403);\n    exit('No direct script access allowed.');\n}\n\nreturn " . var_export($banerinaConfig, true) . ";\n",
+        LOCK_EX,
+    );
 
     $systemSnippetLanguages = ['default' => 'ru', 'enabled' => ['ru', 'ro'], 'labels' => ['ru' => 'RU', 'ro' => 'RO']];
     $systemSnippetRepo = new ContentRepository($systemSnippetData . '/content', $systemSnippetLanguages);
     $loadSystemSnippetHooks = static function () use ($projectRoot, $systemSnippetData, $systemSnippetLanguages, $systemSnippetRepo): Hooks {
         $hooks = new Hooks();
         $context = new PluginContext($hooks, ['name' => 'Smoke'], $systemSnippetLanguages, $systemSnippetData, $projectRoot . '/root/murcms/plugins', $systemSnippetRepo);
-        $plugins = new PluginManager($projectRoot . '/root/murcms/plugins', ['enabled' => ['snippets']], $context);
+        $plugins = new PluginManager($projectRoot . '/root/murcms/plugins', ['enabled' => ['snippets', 'banerina']], $context);
         $plugins->loadEnabled();
         return $hooks;
     };
@@ -452,6 +461,40 @@ try {
     $check(str_contains($fallbackHooks->render('layout.header_before', ['language' => 'ru']), 'GLOBAL-HEADER-BEFORE'), 'System snippet did not fall back to global scope.');
     $check($fallbackHooks->render('layout.main_before', ['language' => 'ru']) === '', 'Missing system snippet produced output or a placeholder file.');
     $check(str_contains((string) $fallbackHooks->filter('content.document', '[snippet=normal]', ['language' => 'ru']), 'NORMAL-SNIPPET'), 'Ordinary snippet rendering regressed.');
+    $check($fallbackHooks->has('snippets.render') && $fallbackHooks->has('snippets.registry'), 'Snippets public API hooks were not registered.');
+    $snippetApiHtml = (string) $fallbackHooks->filter('snippets.render', '', ['id' => 'normal', 'language' => 'ru']);
+    $check(str_contains($snippetApiHtml, 'NORMAL-SNIPPET'), 'snippets.render did not use the ordinary Snippets render pipeline.');
+    $check($fallbackHooks->filter('snippets.render', '', ['id' => '../normal', 'language' => 'ru']) === '', 'snippets.render accepted an invalid snippet ID.');
+    $snippetRegistry = $fallbackHooks->filter('snippets.registry', [], []);
+    $normalRegistry = array_values(array_filter(
+        is_array($snippetRegistry) ? $snippetRegistry : [],
+        static fn (mixed $entry): bool => is_array($entry) && ($entry['id'] ?? '') === 'normal',
+    ));
+    $check(
+        isset($normalRegistry[0])
+        && in_array('ru', (array) ($normalRegistry[0]['scopes'] ?? []), true)
+        && in_array('mur.md', (array) ($normalRegistry[0]['formats'] ?? []), true),
+        'snippets.registry did not expose snippet scope and format metadata.',
+    );
+    $directPromo = (string) $fallbackHooks->filter('content.document', '[promo=normal]', ['language' => 'ru']);
+    $check(
+        str_contains($directPromo, 'NORMAL-SNIPPET')
+        && str_contains($directPromo, 'class="mur-promo"')
+        && str_contains($directPromo, 'data-promo-mode="direct"'),
+        'Banerina did not render a direct snippet through Snippets.',
+    );
+    $rotationHooks = $loadSystemSnippetHooks();
+    $rotationHtml = (string) $rotationHooks->filter('content.document', "[promo=rotation]\n[promo=rotation]", ['language' => 'ru']);
+    $check(
+        substr_count($rotationHtml, 'NORMAL-SNIPPET') === 1
+        && substr_count($rotationHtml, 'ALTERNATE-SNIPPET') === 1
+        && substr_count($rotationHtml, 'data-promo-group="rotation"') === 2,
+        'Banerina group rotation did not avoid duplicates inside one request.',
+    );
+    $check(
+        $rotationHooks->filter('content.document', '[promo=inactive]', ['language' => 'ru']) === '',
+        'Banerina rendered an inactive group.',
+    );
 
     $localHeaderFile = $systemSnippetData . '/snippets/ru/system-header-before.mur.md';
     file_put_contents($localHeaderFile, "id: system-header-before\nstatus: draft\ntype: html\n---\n\n<span>DRAFT-HEADER</span>\n", LOCK_EX);
@@ -798,8 +841,15 @@ $adminRouter = new AdminRouter(
     new AdminRenderer($config['site'], new AdminI18n($projectRoot . '/root/murcms/admin/lang', $config['admin'])),
 );
 $check(in_array('murconsent', $adminPlugins->loaded(), true), 'MurConsent was not loaded by PluginManager.');
+$check(in_array('banerina', $adminPlugins->loaded(), true), 'Banerina was not loaded by PluginManager.');
 $check(\MurCMS\MurConsent\Plugin::VERSION === '1.0.3', 'The current MurConsent 1.0.3 plugin is not installed.');
-$check(\MurCMS\MurTextPlugin\Version::PLUGIN === '0.2.3', 'The current MurText 0.2.3 integration plugin is not installed.');
+$check(\MurCMS\BanerinaPlugin\BanerinaPlugin::VERSION === '0.1.1', 'The current Banerina 0.1.1 plugin is not installed.');
+$check(\MurCMS\MurTextPlugin\Version::PLUGIN === '0.2.4', 'The current MurText 0.2.4 integration plugin is not installed.');
+$check(
+    is_file($projectRoot . '/root/murcms/assets/plugins/banerina/admin.css')
+    && is_file($projectRoot . '/root/murcms/assets/plugins/banerina/admin.js'),
+    'Banerina admin assets are missing from the public asset tree.',
+);
 $check(
     is_file($projectRoot . '/root/murcms/assets/plugins/murtext/admin.css')
     && is_file($projectRoot . '/root/murcms/assets/plugins/murtext/admin.js')
@@ -852,8 +902,10 @@ $check(str_contains($adminPageHtml, mur_favicon_link($config['site'], 'admin')),
 $check(str_contains($adminPageHtml, '/murcms/assets/admin-theme.js?v='), 'Shared admin interactions are not loaded outside template pages.');
 $siteSettingsMethod = new ReflectionMethod(AdminRouter::class, 'siteSettings');
 $siteSettingsHtml = (string) $siteSettingsMethod->invoke($adminRouter, 'GET', $adminUser);
-$check(str_contains($siteSettingsHtml, 'name="favicon_frontend"') && str_contains($siteSettingsHtml, 'name="favicon_admin"'), 'Site settings do not expose frontend and admin favicon paths.');
-$check(str_contains($siteSettingsHtml, 'favicon*.png') && str_contains($siteSettingsHtml, 'favicon*.svg') && str_contains($siteSettingsHtml, 'favicon*.webp'), 'Site settings do not explain automatic favicon discovery.');
+$frontendSettingsHtml = (string) (new ReflectionMethod(AdminRouter::class, 'languageSettings'))->invoke($adminRouter, 'GET', $adminUser);
+$adminSettingsHtml = (string) (new ReflectionMethod(AdminRouter::class, 'adminSettings'))->invoke($adminRouter, 'GET', $adminUser);
+$check(str_contains($frontendSettingsHtml, 'name="favicon_frontend"') && str_contains($adminSettingsHtml, 'name="favicon_admin"') && !str_contains($siteSettingsHtml, 'name="favicon_'), 'Favicon controls are not located in frontend/admin settings.');
+$check(str_contains($frontendSettingsHtml, 'favicon*') && str_contains($frontendSettingsHtml, 'PNG/SVG/WebP'), 'Frontend settings do not explain favicon discovery.');
 $dashboardMethod = new ReflectionMethod(AdminRouter::class, 'dashboard');
 $dashboardHtml = (string) $dashboardMethod->invoke($adminRouter);
 foreach (['pages', 'home-blocks', 'footer-blocks', 'sitemap-urls', 'plugins', 'cms-version'] as $dashboardStat) {
@@ -873,11 +925,13 @@ $check(
     && !str_contains($editorNavHtml, '/admin/settings/users')
     && !str_contains($editorNavHtml, '/admin/seo')
     && !str_contains($editorNavHtml, '/admin/template')
+    && !str_contains($editorNavHtml, '/admin/plugin/banerina')
     && !str_contains($editorNavHtml, '/admin/plugin/murconsent'),
     'Editor navigation exposes privileged routes.',
 );
 $adminNavHtml = json_encode($navGroupsMethod->invoke($adminRouter, $adminUser), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?: '';
 $check(str_contains($adminNavHtml, '/admin/settings/users'), 'Admin navigation does not expose user management.');
+$check(str_contains($adminNavHtml, '/admin/plugin/banerina'), 'Admin navigation does not expose Banerina.');
 $check(str_contains($adminNavHtml, '/admin/plugin/murconsent'), 'Admin navigation does not expose MurConsent.');
 $check(
     $requiredRoleMethod->invoke($adminRouter, 'content/pages') === 'editor'
@@ -893,6 +947,7 @@ $bundledAdminRouteRoles = [
     'plugin/gallery' => 'editor',
     'plugin/tags' => 'editor',
     'plugin/redirects' => 'admin',
+    'plugin/banerina' => 'admin',
     'plugin/murconsent' => 'admin',
     'plugin/murtext' => 'admin',
 ];
@@ -915,6 +970,16 @@ $check(
     str_contains((string) $dispatchMethod->invoke($adminRouter, 'plugin/redirects', $adminUser, 'GET'), 'name="rules"')
     && str_contains((string) $dispatchMethod->invoke($adminRouter, 'plugin/redirects', $superUser, 'GET'), 'name="rules"'),
     'Admin or super-admin cannot open the Redirects admin route.',
+);
+$banerinaDenied = (string) $dispatchMethod->invoke($adminRouter, 'plugin/banerina', $editorUser, 'GET');
+$check(
+    str_contains($banerinaDenied, 'Доступ запрещен') && !str_contains($banerinaDenied, 'banerina-admin-head'),
+    'Editor can read the Banerina admin route through a direct URL.',
+);
+$check(
+    str_contains((string) $dispatchMethod->invoke($adminRouter, 'plugin/banerina', $adminUser, 'GET'), 'banerina-admin-head')
+    && str_contains((string) $dispatchMethod->invoke($adminRouter, 'plugin/banerina', $superUser, 'GET'), 'banerina-admin-head'),
+    'Admin or super-admin cannot open the Banerina admin route.',
 );
 
 $routeAuthHooks = new Hooks();
@@ -1020,7 +1085,7 @@ $documentsTableHtml = (string) $documentsTableMethod->invoke($adminRouter, 'page
 $check(str_contains($documentsTableHtml, 'class="admin-table admin-documents-table"'), 'Document lists do not use the compact table layout.');
 $check(str_contains($documentsTableHtml, 'data-language="ru"') && !str_contains($documentsTableHtml, 'data-language="ro"'), 'Pages list does not default to the primary language.');
 $check(str_contains($documentsTableHtml, 'class="admin-document-cell"') && str_contains($documentsTableHtml, 'class="admin-document-id"') && str_contains($documentsTableHtml, 'class="admin-document-url"'), 'Document title, ID and URL were not combined into one cell.');
-$check(str_contains($documentsTableHtml, '<span class="visually-hidden">Выбор</span></th><th>Страница</th><th>Статус</th><th>Действия</th>'), 'Document list columns are incorrect.');
+$check(str_contains($documentsTableHtml, '<span class="visually-hidden">Выбор</span></th><th>Страница</th><th>Изменено</th><th>Статус</th><th>Действия</th>'), 'Document list columns are incorrect.');
 $check(str_contains($documentsTableHtml, 'name="selected[]" value="ru:') && str_contains($documentsTableHtml, 'aria-label="Выбрать страницу'), 'Pages list row checkboxes are missing.');
 $check(str_contains($documentsTableHtml, 'class="admin-form admin-page-filters"') && str_contains($documentsTableHtml, 'name="filter"') && str_contains($documentsTableHtml, 'name="status"') && str_contains($documentsTableHtml, 'name="per_page"'), 'Pages list filter and page-size controls are missing.');
 $check(str_contains($documentsTableHtml, '<option value="" selected>RU — основной язык</option>') && str_contains($documentsTableHtml, '<option value="all">Все языки (без пакетных действий)</option>') && str_contains($documentsTableHtml, 'value="category:ru:company"') && str_contains($documentsTableHtml, 'value="parent:ru:services"'), 'Pages list language or structural filter options are incomplete.');
@@ -1130,7 +1195,9 @@ try {
     $snippetEditorMethod = new ReflectionMethod(AdminRouter::class, 'snippetsEditor');
     $snippetEditorHtml = (string) $snippetEditorMethod->invoke($adminRouter, 'GET', $adminUser);
     $check(str_contains($snippetEditorHtml, 'data-smoke-editor="snippet" data-smoke-textarea="body"'), 'admin.editor_tools is missing from the snippet editor.');
-    $check(substr_count($snippetEditorHtml, 'data-system-snippet=') === 11 && str_contains($snippetEditorHtml, 'name="system_scope"'), 'System snippet registry is not scope-aware or does not contain 11 positions.');
+    $_GET = ['tab' => 'system'];
+    $snippetEditorHtml = (string) $snippetEditorMethod->invoke($adminRouter, 'GET', $adminUser);
+    $check(substr_count($snippetEditorHtml, 'data-system-snippet=') === 11 && str_contains($snippetEditorHtml, 'aria-label="Область системных snippets"'), 'System snippet registry is not scope-aware or does not contain 11 positions.');
     foreach (['system-header-before', 'system-header-after', 'system-main-before', 'system-main-after'] as $systemSnippetName) {
         $check(str_contains($snippetEditorHtml, 'data-system-snippet="' . $systemSnippetName . '"'), "System snippet registry is missing {$systemSnippetName}.");
     }
@@ -1146,9 +1213,9 @@ try {
         if (is_file($registryLocalFile)) {
             unlink($registryLocalFile);
         }
-        $_GET = ['system_scope' => 'ro'];
+        $_GET = ['tab' => 'system', 'system_scope' => 'ro'];
         $fallbackRegistryHtml = (string) $snippetEditorMethod->invoke($adminRouter, 'GET', $adminUser);
-        $check(str_contains($fallbackRegistryHtml, 'Используется fallback: global') && str_contains($fallbackRegistryHtml, 'Создать переопределение'), 'System snippet registry does not distinguish fallback from an exact scope file.');
+        $check(str_contains($fallbackRegistryHtml, 'Fallback global:') && str_contains($fallbackRegistryHtml, 'Создать переопределение'), 'System snippet registry does not distinguish fallback from an exact scope file.');
         $check(str_contains($fallbackRegistryHtml, 'lang=ro&amp;name=system-main-after'), 'System snippet override action does not prefill the selected scope and name.');
 
         file_put_contents($registryLocalFile, "id: system-main-after\nstatus: draft\ntype: html\n---\n\nlocal draft\n", LOCK_EX);
@@ -1674,6 +1741,7 @@ $blocksPluginSource = file_get_contents($projectRoot . '/root/murcms/plugins/blo
 $galleryPluginSource = file_get_contents($projectRoot . '/root/murcms/plugins/gallery/plugin.php') ?: '';
 $redirectsPluginSource = file_get_contents($projectRoot . '/root/murcms/plugins/redirects/src/RedirectsPlugin.php') ?: '';
 $murConsentAdminSource = file_get_contents($projectRoot . '/root/murcms/plugins/murconsent/src/AdminUi.php') ?: '';
+$banerinaStoreSource = file_get_contents($projectRoot . '/root/murcms/plugins/banerina/src/ConfigStore.php') ?: '';
 $check(
     str_contains($tagsPluginSource, "'role' => 'editor'")
     && str_contains($blocksPluginSource, "'role' => 'editor'")
@@ -1689,6 +1757,12 @@ $check(
 $check(
     str_contains($murConsentAdminSource, '. "if (!defined(\'MUR_CMS_BOOTSTRAPPED\')) {\\n"'),
     'MurConsent config writer does not preserve the direct-access guard.',
+);
+$check(
+    str_contains($banerinaStoreSource, ". \"if (!defined('MUR_CMS_BOOTSTRAPPED')) {\\n\"")
+    && str_contains($banerinaStoreSource, 'file_put_contents($tmp, $php, LOCK_EX)')
+    && str_contains($banerinaStoreSource, '@rename($tmp, $this->configPath)'),
+    'Banerina config writer is missing the direct-access guard or atomic replacement.',
 );
 $adminThemeJs = file_get_contents($projectRoot . '/root/murcms/assets/admin-theme.js') ?: '';
 $adminMediaJs = file_get_contents($projectRoot . '/root/murcms/assets/admin-media.js') ?: '';
